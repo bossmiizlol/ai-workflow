@@ -1,0 +1,50 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  install-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install PyYAML
+
+      - name: Install into an isolated home
+        run: |
+          home="$(mktemp -d)"
+          echo "TEST_HOME=$home" >> "$GITHUB_ENV"
+          python3 scripts/install.py --home "$home" --dry-run
+          python3 scripts/install.py --home "$home"
+
+      - name: Validate the installation against this checkout
+        run: python3 scripts/test_global_setup.py --home "$TEST_HOME" --repo . -v
+
+      - name: Re-running the installer changes nothing
+        run: |
+          python3 scripts/install.py --home "$TEST_HOME" | tee rerun.log
+          if grep -qE '^(Installed|Linked|Merged|Backed up)' rerun.log; then
+            echo "installer is not idempotent"; exit 1
+          fi
+
+      - name: Existing files are preserved, not clobbered
+        run: |
+          home="$(mktemp -d)"
+          mkdir -p "$home/.codex" "$home/.claude/skills/grill-me"
+          echo "keep me" > "$home/.codex/AGENTS.md"
+          echo "a real skill" > "$home/.claude/skills/grill-me/SKILL.md"
+          if python3 scripts/install.py --home "$home"; then
+            echo "installer should have refused without --upgrade"; exit 1
+          fi
+          python3 scripts/install.py --home "$home" --upgrade
+          grep -q "keep me" "$home/.codex/AGENTS.md"
+          test -L "$home/.claude/skills/grill-me"
+          find "$home/.config/ai-workflow/backups" -name SKILL.md | grep -q .
+          python3 scripts/test_global_setup.py --home "$home" --repo . -v
