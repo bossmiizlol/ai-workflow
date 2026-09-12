@@ -44,7 +44,7 @@ Use the current lead model and user-selected reasoning effort. Do not require a
 particular model identity unless the user or applicable project instructions do.
 For delegated work, prefer available `terra_worker` roles for coupled or ambiguous
 implementation, `luna_worker` roles for fully specified mechanical edits, and the
-`solweaver_reviewer` role for independent review, when those roles fit the
+`fresh_reviewer` role for independent review, when those roles fit the
 project. Otherwise use an available general implementation or review agent.
 Inherit model settings unless an applicable instruction specifies them.
 
@@ -80,7 +80,7 @@ concurrency and keep the lead responsible for integration and verification.
 
 Required for `solo-reviewed`, and when the user or project explicitly requires it.
 Use a fresh read-only reviewer who did not implement the candidate; prefer the
-`solweaver_reviewer` role when it is available, otherwise another suitable
+`fresh_reviewer` role when it is available, otherwise another suitable
 read-only review role or a general agent. Supply the request, applicable
 instructions, candidate diff, and verification evidence. Review correctness,
 regressions, scope, and missing acceptance evidence.

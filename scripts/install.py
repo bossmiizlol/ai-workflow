@@ -39,7 +39,10 @@ SHARED_SKILLS = (
     "junior-to-senior",
     "last-20-percent",
 )
-CODEX_AGENTS = ("terra-worker.toml", "luna-worker.toml", "solweaver-reviewer.toml")
+CODEX_AGENTS = ("terra-worker.toml", "luna-worker.toml", "fresh-reviewer.toml")
+# Definitions this setup used to install. An upgrade retires them instead of
+# leaving a stale role behind for the tool to offer.
+RETIRED_CODEX_AGENTS = ("solweaver-reviewer.toml",)
 CLAUDE_AGENTS = ("sonnet-worker.md", "haiku-worker.md", "fresh-reviewer.md")
 
 IGNORE = shutil.ignore_patterns("__pycache__", "*.py[co]", ".DS_Store")
@@ -56,6 +59,7 @@ class Plan:
         self.trees: list[tuple[Path, Path]] = []             # source dir, target dir
         self.links: list[tuple[Path, Path]] = []             # link, target
         self.blocks: list[tuple[Path, str]] = []             # entry file, block body
+        self.retire: list[Path] = []                         # paths to remove if present
 
     def targets(self) -> list[Path]:
         return (
@@ -63,6 +67,7 @@ class Plan:
             + [target for _, target in self.trees]
             + [link for link, _ in self.links]
             + [path for path, _ in self.blocks]
+            + list(self.retire)
         )
 
     def sources(self) -> list[Path]:
@@ -164,6 +169,9 @@ def build_plan(args: argparse.Namespace) -> tuple[Plan, Path, dict[str, Path]]:
         plan.copies.append((REPO_ROOT / "agents/claude" / name,
                             dirs["claude"] / "agents" / name, True))
 
+    for name in RETIRED_CODEX_AGENTS:
+        plan.retire.append(dirs["codex"] / "agents" / name)
+
     plan.blocks.append((dirs["codex"] / "AGENTS.md", REPO_ROOT / "entry/codex-AGENTS.md"))
     plan.blocks.append((dirs["claude"] / "CLAUDE.md", REPO_ROOT / "entry/claude-CLAUDE.md"))
 
@@ -258,6 +266,10 @@ def main(argv: list[str] | None = None) -> int:
             conflicts.append((link, "symlink pointing elsewhere"))
         else:
             conflicts.append((link, "REAL directory where a symlink belongs"))
+    for path in plan.retire:
+        if path.exists() or path.is_symlink():
+            conflicts.append((path, "retired: removed, not replaced"))
+
     for entry, block_source in plan.blocks:
         if not entry.exists():
             continue
@@ -272,14 +284,15 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Dry run against home {args.home}")
         print(f"  WORKFLOW.md -> {workflow_md}")
         for path, kind in conflicts:
-            print(f"  REPLACE  {path}  ({kind})")
+            verb = "REMOVE " if kind.startswith("retired") else "REPLACE"
+            print(f"  {verb}  {path}  ({kind})")
         for path in sorted(set(plan.targets()) - reusable - {p for p, _ in conflicts}):
             print(f"  CREATE   {path}")
         for path in sorted(reusable):
             print(f"  UNCHANGED {path}")
         if conflicts and not args.upgrade:
             print()
-            print("Every REPLACE above needs --upgrade, which backs the path up to")
+            print("Every REPLACE/REMOVE above needs --upgrade, which backs the path up to")
             print(f"{plan.backup_root} before replacing it.")
         return 0
 

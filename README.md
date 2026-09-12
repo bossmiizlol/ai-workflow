@@ -47,6 +47,10 @@ with `--upgrade` to back each conflicting path up under
 an already-installed machine is a no-op, and merging the entry blocks preserves
 whatever else those files contain.
 
+Upgrading an older installation also retires definitions this setup no longer
+ships: `--dry-run` lists them as `REMOVE`, and `--upgrade` backs each one up
+before deleting it, so a stale role is not left behind for the tool to offer.
+
 Useful flags: `--home` for a relocated or test installation, and
 `--workflow-dir`, `--shared-skills-dir`, `--codex-home`, `--claude-home` when a
 tool does not use its default directory (a custom `CODEX_HOME`, for example).
@@ -90,8 +94,8 @@ machines.
 
 ## Attribution
 
-MIT licensed; see `LICENSE`. The Codex worker and reviewer roles descend from
-[Solweaver](https://github.com/jay7793/solweaver) (MIT). The shared skills are
+MIT licensed; see `LICENSE`. The shared workflow, both Goal skills and all six
+agent role definitions are original to this repository. The shared skills are
 vendored with their own licenses and `UPSTREAM.md` provenance preserved:
 `test-driven-development` from [`obra/superpowers`](https://github.com/obra/superpowers),
 `diagnosing-bugs` from [`mattpocock/skills`](https://github.com/mattpocock/skills),

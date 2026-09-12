@@ -31,7 +31,8 @@ SHARED_SKILLS = ('test-driven-development', 'diagnosing-bugs', 'grill-me', 'desl
                  'junior-to-senior', 'last-20-percent')
 CODEX_AGENTS = (('terra-worker.toml', 'terra_worker'),
                 ('luna-worker.toml', 'luna_worker'),
-                ('solweaver-reviewer.toml', 'solweaver_reviewer'))
+                ('fresh-reviewer.toml', 'fresh_reviewer'))
+RETIRED_CODEX_AGENTS = ('solweaver-reviewer.toml',)
 CLAUDE_AGENTS = ('sonnet-worker', 'haiku-worker', 'fresh-reviewer')
 TOKEN = '{{WORKFLOW_MD}}'
 
@@ -142,7 +143,7 @@ class GlobalSetupTests(unittest.TestCase):
                 data = tomllib.loads((ROOT / '.codex/agents' / filename).read_text(encoding='utf-8'))
                 self.assertEqual(data['name'], role)
                 self.assertTrue(data['developer_instructions'])
-                if role == 'solweaver_reviewer':
+                if role == 'fresh_reviewer':
                     self.assertEqual(data['sandbox_mode'], 'read-only')
 
     @unittest.skipIf(tomllib is None, 'needs Python 3.11+ or tomli for TOML checks')
@@ -155,6 +156,13 @@ class GlobalSetupTests(unittest.TestCase):
                 disabled = Path(entry['path']).expanduser().resolve()
                 self.assertNotIn(disabled, maintained,
                                  'A maintained shared skill is disabled globally.')
+
+    def test_retired_definitions_are_gone(self):
+        """A role this setup no longer ships must not linger and be offered."""
+        for name in RETIRED_CODEX_AGENTS:
+            path = ROOT / '.codex/agents' / name
+            with self.subTest(agent=name):
+                self.assertFalse(path.exists(), f'retired definition still installed: {path}')
 
     def test_installed_provenance_digests(self):
         for name in SHARED_SKILLS:
