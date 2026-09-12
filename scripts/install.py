@@ -268,15 +268,6 @@ def main(argv: list[str] | None = None) -> int:
         else:
             conflicts.append((entry, "entry instructions"))
 
-    if conflicts and not args.upgrade:
-        print("Refusing to overwrite existing paths:")
-        for path, kind in conflicts:
-            print(f"  - {path}  ({kind})")
-        print()
-        print("Rerun with --upgrade to back each one up before replacing it,")
-        print(f"or inspect them first with --dry-run. Backups go to {plan.backup_root}.")
-        return 1
-
     if args.dry_run:
         print(f"Dry run against home {args.home}")
         print(f"  WORKFLOW.md -> {workflow_md}")
@@ -286,7 +277,20 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  CREATE   {path}")
         for path in sorted(reusable):
             print(f"  UNCHANGED {path}")
+        if conflicts and not args.upgrade:
+            print()
+            print("Every REPLACE above needs --upgrade, which backs the path up to")
+            print(f"{plan.backup_root} before replacing it.")
         return 0
+
+    if conflicts and not args.upgrade:
+        print("Refusing to overwrite existing paths:")
+        for path, kind in conflicts:
+            print(f"  - {path}  ({kind})")
+        print()
+        print("Rerun with --upgrade to back each one up before replacing it,")
+        print(f"or inspect them first with --dry-run. Backups go to {plan.backup_root}.")
+        return 1
 
     backup_root = plan.backup_root / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
