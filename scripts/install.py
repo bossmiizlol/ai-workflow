@@ -5,11 +5,11 @@ One source of truth lives in this repository:
 
   ai-workflow/WORKFLOW.md      shared working agreements both tools read
   skills/shared/<name>         generic skills, installed once into ~/.agents/skills
-  skills/goal/<tool>/SKILL.md  the per-tool Goal workflow skill
+  skills/goal/<tool>/         the per-tool Goal workflow skill and references
   agents/<tool>/<file>         per-tool subagent role definitions
   entry/<tool>-<FILE>          the block merged into each tool's entry instructions
 
-Claude Code sees the shared skills through symlinks into ~/.agents/skills, so a
+Both tools see the shared skills through symlinks into ~/.agents/skills, so a
 shared method is edited in exactly one place. Every reference to WORKFLOW.md is
 stored as the placeholder {{WORKFLOW_MD}} and rendered to an absolute path at
 install time, which is what makes the repository portable between machines.
@@ -38,6 +38,8 @@ SHARED_SKILLS = (
     "deslopify",
     "junior-to-senior",
     "last-20-percent",
+    "handoff",
+    "improve-codebase-architecture",
 )
 CODEX_AGENTS = ("terra-worker.toml", "luna-worker.toml", "fresh-reviewer.toml")
 # Definitions this setup used to install. An upgrade retires them instead of
@@ -156,11 +158,14 @@ def build_plan(args: argparse.Namespace) -> tuple[Plan, Path, dict[str, Path]]:
     for name in SHARED_SKILLS:
         plan.trees.append((REPO_ROOT / "skills/shared" / name, dirs["shared"] / name))
         plan.links.append((dirs["claude"] / "skills" / name, dirs["shared"] / name))
+        plan.links.append((dirs["codex"] / "skills" / name, dirs["shared"] / name))
 
-    plan.copies.append((REPO_ROOT / "skills/goal/codex/SKILL.md",
-                        dirs["codex"] / "skills/goal/SKILL.md", True))
-    plan.copies.append((REPO_ROOT / "skills/goal/claude/SKILL.md",
-                        dirs["claude"] / "skills/goal/SKILL.md", True))
+    for tool in ("codex", "claude"):
+        source_dir = REPO_ROOT / "skills/goal" / tool
+        plan.copies.append((source_dir / "SKILL.md",
+                            dirs[tool] / "skills/goal/SKILL.md", True))
+        for source in sorted((source_dir / "references").rglob("*.md")):
+            plan.copies.append((source, dirs[tool] / "skills/goal" / source.relative_to(source_dir), True))
 
     for name in CODEX_AGENTS:
         plan.copies.append((REPO_ROOT / "agents/codex" / name,
@@ -286,7 +291,7 @@ def main(argv: list[str] | None = None) -> int:
         for path, kind in conflicts:
             verb = "REMOVE " if kind.startswith("retired") else "REPLACE"
             print(f"  {verb}  {path}  ({kind})")
-        for path in sorted(set(plan.targets()) - reusable - {p for p, _ in conflicts}):
+        for path in sorted(set(plan.targets()) - reusable - {p for p, _ in conflicts} - set(plan.retire)):
             print(f"  CREATE   {path}")
         for path in sorted(reusable):
             print(f"  UNCHANGED {path}")
@@ -379,7 +384,7 @@ def main(argv: list[str] | None = None) -> int:
                             "--home", str(args.home.expanduser().resolve(strict=False)), "-v"])
     print()
     print(f"Shared workflow: {workflow_md}")
-    print(f"Shared skills:   {dirs['shared']}  (Claude reads them through symlinks)")
+    print(f"Shared skills:   {dirs['shared']}  (both tools read them through symlinks)")
     print("Next:")
     print(f"  1. Validate with: {validator}")
     print("  2. Restart Codex and start a new Claude Code session; both read")

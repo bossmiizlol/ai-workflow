@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: Calibrated grilling session for stress-testing a plan, design, idea, or decision. First assesses the user's topic knowledge, confidence, and desired pressure level, then asks one question at a time with recommended answers. Use when user says "grill me", "stress-test this", "challenge my plan", "interview me", or wants a plan probed without being overwhelmed. For document-backed review, use the domain reference.
+description: Stress-test a plan or decision through adaptive questions when the user requests an interview or challenge.
 ---
 
 # Grill Me
@@ -33,17 +33,20 @@ Identify what should be grilled before asking about comfort. If the topic is not
 >
 > Recommended answer: give me the concrete goal, current approach, constraints, and what decision you need to make.
 
-If context already contains the plan, summarize it in 3-6 bullets and ask for correction:
-
-> I think target is: [...]
->
-> Recommended answer: "Yes, grill that" or "Adjust: ..."
+If context already identifies the plan, use it directly. Briefly state your
+understanding only when useful, then ask the first substantive question. Ask for
+clarification only when ambiguity would materially change the interview; do not
+require confirmation of a target the user already supplied.
 
 ## Phase 2: Calibration
 
-Before grilling the topic, ask a short calibration question unless the user's level is already obvious from context.
+Use the user's stated knowledge level and desired pressure from the conversation.
+If either is missing, default to Working knowledge and Standard pressure, state
+that assumption briefly, and start the substantive interview. Ask a calibration
+question only when the missing information would materially change your approach.
+Do not repeat calibration the user has already supplied.
 
-Ask:
+When calibration is necessary, ask:
 
 > Before I grill the plan: what is your current comfort with this topic, and how hard do you want the pressure?
 >

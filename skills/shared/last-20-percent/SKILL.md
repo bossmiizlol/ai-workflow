@@ -1,13 +1,6 @@
 ---
 name: last-20-percent
-description: >
-  Finds and finishes the last 20% of a built solution — the experiential layer
-  agents skip: what the output actually reads like, which pages or screens
-  should exist, first-run and empty states, opinionated defaults, the golden
-  path. Use when the user explicitly asks to plan or audit the experiential
-  layer, or says "last 20%", "finish this", "make it
-  actually good", "is this actually done", or "why does this feel flat".
-  Do not invoke automatically for ordinary builds or completion checks.
+description: "Audit or finish product experience details when the user explicitly requests a last-mile or experiential review."
 ---
 
 # The Last 20%

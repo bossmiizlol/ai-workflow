@@ -38,15 +38,8 @@ No fixed lead model. Use the model and reasoning effort the user selected, and
 never ask the user to switch models unless their own instructions or the
 project's instructions require a specific one.
 
-For delegated work, when those agents are available:
-
-- `sonnet-worker` — coupled, ambiguous, multi-file, judgment-heavy lanes.
-- `haiku-worker` — fully specified mechanical lanes.
-- `fresh-reviewer` — independent read-only review; choose its model to fit the
-  change and never give it work it wrote itself.
-
-Otherwise use a general-purpose implementation or review agent that the session
-actually offers. Check the session's own agent list rather than assuming.
+The `goal` skill owns delegation roles and their routing. Check the session's
+own agent list rather than assuming a role exists.
 
 ## Shared personal defaults
 

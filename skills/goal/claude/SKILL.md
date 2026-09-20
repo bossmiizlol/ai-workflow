@@ -35,6 +35,12 @@ Include this path and the selected skill paths in delegation packets.
   their project. Use the user's language unless project instructions require
   otherwise.
 
+## Invocation boundary
+
+Interpret explicit software delegation requests in the user's language, including
+Thai requests such as “แบ่งงานให้ subagents ช่วยแก้บั๊ก”. Merely mentioning Goal,
+quoting a mode, or asking to inspect or edit workflow settings does not activate it.
+
 ## Execution modes
 
 State the selected mode and assurance level briefly before substantial work,
@@ -82,7 +88,9 @@ For delegated work, prefer these agents when the session offers them:
 
 If those are unavailable, use a general implementation or review agent the
 session actually has. Inherit model settings unless an instruction specifies
-them.
+them. To pick a different model for one spawn, pass the Agent tool's `model`
+parameter (one of the values the session offers, such as `sonnet`, `opus`,
+`haiku`, or `fable`); it overrides the agent file's `model` for that call only.
 
 ## Implementation and verification
 
@@ -111,11 +119,29 @@ must receive a self-contained packet. Use the current runtime's supported
 fresh-context mechanism; do not assume it inherits files the lead has read.
 Do not copy Codex-only spawn parameters into Claude tool calls.
 
+In Claude Code, that mechanism is an `Agent` call with a named `subagent_type`
+(`sonnet-worker`, `haiku-worker`, `fresh-reviewer`, or a general agent): it
+starts cold. `subagent_type: "fork"` inherits the lead's context, so never use it
+for a worker that must rely on its packet or for any independent review.
+
+Agents run in the background by default, and the lead is notified when one
+finishes. Do not integrate, verify, or review a lane before its completion
+notification arrives, and never predict or summarize a result that has not
+arrived. Pass `run_in_background: false` only when the lead's very next step
+depends on that result and nothing else useful can run meanwhile.
+
+To continue an agent with its context intact — sending review findings back to
+the original implementer, or asking a reviewer to reassess — use `SendMessage`
+with that agent's ID or name (load it through `ToolSearch` if it is deferred).
+A new `Agent` call starts a different agent with no memory of the lane.
+
 Tell workers they share the codebase and must preserve others' changes. Avoid
 concurrent writes to the same files; sequence dependent work. Prefer one worker
 and add a second only for genuinely independent lanes with disjoint write scope.
-Respect available concurrency, and keep the lead responsible for integration and
-verification.
+When parallel lanes would otherwise collide on the working tree, `isolation:
+"worktree"` gives a worker its own git worktree; the lead still integrates and
+verifies the result in the main tree. Respect available concurrency, and keep the
+lead responsible for integration and verification.
 
 Write packets and worker reports in English. Everything the user reads follows
 the user's language and the project's communication rules.
@@ -129,17 +155,19 @@ empty context, not a different model. A parent self-review is never an
 independent review. Start a new reviewer with the current runtime's supported
 fresh-context mechanism, without the implementation conversation or the lead's
 private reasoning. If that isolation is unavailable, report the review gate as
-incomplete. Reuse that reviewer only for reassessing its findings.
+incomplete. Reuse that reviewer, through `SendMessage`, only for reassessing its
+findings.
 
-Freeze the candidate and get the project's full verification pass green first.
-Supply the reviewer with the request, the applicable instructions, the complete
-change manifest — staged, unstaged, untracked, and any locally excluded or
-`skip-worktree` files — and the verification evidence you already have.
+Freeze the candidate and get the project's full verification pass green first;
+report blocked checks rather than implying they passed. Supply the reviewer with
+the request, the applicable instructions, the complete change manifest — staged,
+unstaged, untracked, and any locally excluded or `skip-worktree` files — and the
+verification evidence you already have.
 
-A review returns `ship`, `fix-first`, or `rethink`. Resolve material findings
-with the original implementer of that lane, rerun the affected checks, refreeze,
-and have the reviewer reassess the changed areas. Keep follow-up review focused
-on findings and new changes.
+A review returns `ship`, `fix-first`, or `rethink`, with evidence for material
+findings. Resolve material findings with the original implementer of that lane,
+rerun the affected checks, refreeze, and have the reviewer reassess the changed
+areas. Keep follow-up review focused on findings and new changes.
 
 Target one review round, with a hard maximum of three rounds per assurance unit
 (the declared change scope being reviewed). A project may set a lower limit;

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Improve Codebase Architecture"
+  short_description: "Review architecture in an offline report"
+policy:
+  allow_implicit_invocation: false

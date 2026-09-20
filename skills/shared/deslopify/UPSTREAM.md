@@ -9,13 +9,12 @@ The skill was first installed as `fuck-slop` on 2026-07-12, when upstream tip wa
 `e8048f0`. Upstream later renamed it to `deslopify` (`b05ba80`) and rewrote the
 instruction text (`8efe3af`); this installation follows that rewrite.
 
-The only local adaptation is in the `description`: it keeps the superseded
-`fuck slop` / `f*ck slop` / `/fuck-slop` trigger phrases alongside the current
-`deslopify` ones, so an older invocation habit still resolves. The instruction
-body and both references are unchanged from upstream.
+Local adaptations shorten the trigger description and make diagnosis tables and
+change logs opt-in. Routine style checks deliver the rewritten artifact quietly.
+Both reference files remain unchanged from the recorded upstream baseline.
 
 - Recorded upstream `SKILL.md` SHA-256: `51e3b2188f29602660b9824ae6d5d51e1159380b43415b5f1082d6d89e5b24b1`
-- Installed `SKILL.md` SHA-256: `6d88f94bf36e3bd2b703e3dda71f5252cfd3b66a758e1374f55580a51bca82be`
+- Installed `SKILL.md` SHA-256: `f10aa0785748e0231f10daf95988959acee0592e3210dc25797868f36e05f2bb`
 - `references/tells.md` SHA-256 (upstream and installed): `1962a1b0c5ba2f010a1b367a00efc33a7be5fe764f99ba79671ac0d8a0ff67b1`
 - `references/voices.md` SHA-256 (upstream and installed): `1b640d749ba18f0b77da1e66f2bc4a14f2b8213b095e0510a3829b5c36d5706c`
 - Copyright (c) 2026 Julius Brussee
@@ -25,3 +24,12 @@ with this installation, preserve the local adaptation and license, and record th
 new baseline and installed digest. No skills lockfile is required. Run
 `~/.config/ai-workflow/.venv/bin/python ~/.config/ai-workflow/test_global_setup.py -v`
 to check the installed digest and file connections; this does not check upstream freshness.
+
+## Installed-content audit — 2026-09-20
+
+Compared the installed SKILL.md with the recorded upstream commit and verified
+the downloaded upstream SHA-256 before reviewing the diff. The upstream baseline
+was not upgraded. This records current local adaptations, not their original
+edit dates.
+
+The description is concise and covers requested prose edits and pre-publication checks. Diagnosis tables and change logs are opt-in; routine rewrites return the artifact. Legacy trigger phrases are no longer enumerated in the description.

@@ -28,7 +28,8 @@ except ModuleNotFoundError:  # pragma: no cover - older interpreters
         tomllib = None  # type: ignore[assignment]
 
 SHARED_SKILLS = ('test-driven-development', 'diagnosing-bugs', 'grill-me', 'deslopify',
-                 'junior-to-senior', 'last-20-percent')
+                 'junior-to-senior', 'last-20-percent', 'handoff',
+                 'improve-codebase-architecture')
 CODEX_AGENTS = (('terra-worker.toml', 'terra_worker'),
                 ('luna-worker.toml', 'luna_worker'),
                 ('fresh-reviewer.toml', 'fresh_reviewer'))
@@ -111,6 +112,15 @@ class GlobalSetupTests(unittest.TestCase):
                                 'Claude must read the shared skill, not a copy of it')
                 self.assertEqual(path.resolve(strict=True), (SHARED / name).resolve(strict=True))
 
+    def test_codex_skill_links(self):
+        """Codex discovers skills in $CODEX_HOME/skills, so the shared folder must be linked there too."""
+        for name in SHARED_SKILLS:
+            path = ROOT / '.codex/skills' / name
+            with self.subTest(skill=name):
+                self.assertTrue(path.is_symlink(),
+                                'Codex must read the shared skill, not a copy of it')
+                self.assertEqual(path.resolve(strict=True), (SHARED / name).resolve(strict=True))
+
     def test_goal_integrations(self):
         for tool in ('.codex', '.claude'):
             path = ROOT / tool / 'skills/goal/SKILL.md'
@@ -119,6 +129,17 @@ class GlobalSetupTests(unittest.TestCase):
                 self.assertEqual(metadata['name'], 'goal')
                 self.assertTrue(metadata['description'])
                 self.assertIn(str(WORKFLOW), path.read_text(encoding='utf-8'))
+                for target in re.findall(r'\[[^\]]*\]\(([^)]+)\)', path.read_text(encoding='utf-8')):
+                    if not target.startswith(('http:', 'https:', '#')):
+                        self.assertTrue((path.parent / target.split('#')[0]).is_file(), target)
+
+    def test_explicit_only_skills(self):
+        for name in ('handoff', 'improve-codebase-architecture'):
+            with self.subTest(skill=name):
+                directory = SHARED / name
+                self.assertIs(frontmatter(directory / 'SKILL.md')['disable-model-invocation'], True)
+                metadata = yaml.safe_load((directory / 'agents/openai.yaml').read_text())
+                self.assertIs(metadata['policy']['allow_implicit_invocation'], False)
 
     def test_claude_agent_definitions(self):
         for role in CLAUDE_AGENTS:
@@ -206,6 +227,17 @@ class RepositoryParityTests(unittest.TestCase):
             with self.subTest(file=installed):
                 self.assertEqual((ROOT / installed).read_text(encoding='utf-8'),
                                  self.rendered(source))
+
+    def test_goal_resources_match_repository(self):
+        for tool in ('codex', 'claude'):
+            source = REPO / 'skills/goal' / tool
+            for path in sorted(source.rglob('*')):
+                if not path.is_file() or path.name == '.DS_Store':
+                    continue
+                installed = ROOT / f'.{tool}/skills/goal' / path.relative_to(source)
+                with self.subTest(file=str(installed)):
+                    self.assertTrue(installed.is_file(), installed)
+                    self.assertEqual(installed.read_text(), self.rendered(str(path.relative_to(REPO))))
 
     def test_entry_blocks_present(self):
         for source, installed in (('entry/codex-AGENTS.md', '.codex/AGENTS.md'),

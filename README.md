@@ -10,9 +10,9 @@ workflow and the same subagent roles as the machine you left.
 | Repository path | Installed to | Read by |
 | --- | --- | --- |
 | `ai-workflow/WORKFLOW.md` | `~/.config/ai-workflow/WORKFLOW.md` | both, through each entry file |
-| `skills/shared/<name>` | `~/.agents/skills/<name>` | Codex directly, Claude through a symlink |
-| `skills/goal/codex/SKILL.md` | `~/.codex/skills/goal/SKILL.md` | Codex |
-| `skills/goal/claude/SKILL.md` | `~/.claude/skills/goal/SKILL.md` | Claude Code |
+| `skills/shared/<name>` | `~/.agents/skills/<name>` | both, through symlinks in their `skills/` directories |
+| `skills/goal/codex/` | `~/.codex/skills/goal/` | Codex |
+| `skills/goal/claude/` | `~/.claude/skills/goal/` | Claude Code |
 | `agents/codex/*.toml` | `~/.codex/agents/` | Codex |
 | `agents/claude/*.md` | `~/.claude/agents/` | Claude Code |
 | `entry/codex-AGENTS.md` | a managed block in `~/.codex/AGENTS.md` | Codex |
@@ -21,8 +21,8 @@ workflow and the same subagent roles as the machine you left.
 
 Two properties make this portable, and both are enforced by the checks:
 
-- **One copy of every shared skill.** The six generic skills live only in
-  `~/.agents/skills`. Claude Code reaches them through symlinks, so a method is
+- **One copy of every shared skill.** The eight generic skills live only in
+  `~/.agents/skills`. Both tools reach them through symlinks, so a method is
   edited in exactly one place and never drifts between the two tools.
 - **No absolute paths in the repository.** Every reference to the shared
   workflow is stored as the placeholder `{{WORKFLOW_MD}}` and rendered to the
@@ -32,6 +32,12 @@ Two properties make this portable, and both are enforced by the checks:
 Tool-specific pieces stay tool-specific by design: Codex pins worker models and
 reasoning effort in TOML, Claude Code declares its roles in Markdown front
 matter, and each tool gets its own `goal` skill.
+
+`handoff` and `improve-codebase-architecture` are explicit-invocation only:
+use `$handoff` / `$improve-codebase-architecture` in Codex or `/handoff` /
+`/improve-codebase-architecture` in Claude Code. Their invocation metadata is
+preserved during installation. The Codex Goal skill also includes reference
+files for delegation and final-strict review.
 
 ## Install
 
@@ -67,7 +73,8 @@ enables the TOML checks; without it those two checks are skipped, not failed.
 
 The checks are read-only and cover the shared workflow's reachability from both
 entry files, unrendered placeholders, skill metadata and local links, Claude's
-symlinks, Goal metadata, both tools' agent definitions, disabled shared skills,
+and Codex's symlinks, Goal metadata and references, explicit-only invocation,
+both tools' agent definitions, disabled shared skills,
 and the vendored SHA-256 provenance digests.
 
 **They cannot prove a tool actually loaded any of it.** Finish with a fresh
@@ -98,7 +105,8 @@ MIT licensed; see `LICENSE`. The shared workflow, both Goal skills and all six
 agent role definitions are original to this repository. The shared skills are
 vendored with their own licenses and `UPSTREAM.md` provenance preserved:
 `test-driven-development` from [`obra/superpowers`](https://github.com/obra/superpowers),
-`diagnosing-bugs` from [`mattpocock/skills`](https://github.com/mattpocock/skills),
+`diagnosing-bugs`, `handoff`, and `improve-codebase-architecture` from
+[`mattpocock/skills`](https://github.com/mattpocock/skills),
 and `grill-me`, `deslopify`, `junior-to-senior` and `last-20-percent` from
 [`juliusBrussee/skills`](https://github.com/juliusBrussee/skills). Each carries
 local adaptations documented in its own `UPSTREAM.md`; the recorded digests are

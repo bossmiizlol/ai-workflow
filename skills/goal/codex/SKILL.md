@@ -9,92 +9,101 @@ Complete the user's software objective using the current project's conventions.
 This skill is self-contained: no named repository, framework, model family, or
 additional orchestration skill is required.
 
+Do not run this workflow for a request that only discusses or edits workflow
+configuration — the mode table, the agent files, settings, or a repository's
+agent docs. That is ordinary work.
+
 ## Project context
 
 Read `{{WORKFLOW_MD}}` and apply its skill-selection rules.
 Include this path and the selected skill paths in delegation packets.
 
-- Read applicable repository and scoped `AGENTS.md` instructions. Discover the
-  affected modules, existing changes, build commands, and relevant tests before editing.
-- Load available project skills when relevant or required by project instructions.
-  A repository orchestrator may add project-specific rules but is not a prerequisite.
+- Read the repository's `AGENTS.md`, plus the scoped instruction file of every
+  directory the task may touch. Do this even when the session started at the
+  repository root. If scope expands mid-task, read the newly applicable ones
+  before continuing.
+- Discover the affected modules, existing uncommitted changes, build commands,
+  and relevant tests before editing.
+- Load the project skills its instructions require, plus any that are clearly
+  relevant to the lane. A repository orchestration skill adds project rules but
+  is not a prerequisite for this workflow.
 - If no project instructions or extra skills exist, infer conventions from the
   repository and proceed. If an explicitly required dependency is missing, report
-  that specific blocker; do not invent its contents or silently waive it.
+  that specific blocker; never invent its contents or silently waive it.
 - Keep architecture, language, plan format, commands, and domain rules local to
-  their project. Use the user's language unless project instructions require otherwise.
+  their project. Use the user's language unless project instructions require
+  otherwise.
+
+## Invocation boundary
+
+Interpret explicit software delegation requests in the user's language, including
+Thai requests such as “แบ่งงานให้ subagents ช่วยแก้บั๊ก”. Merely mentioning Goal,
+quoting a mode, or asking to inspect or edit workflow settings does not activate it.
 
 ## Execution modes
 
-State the selected mode and verification level briefly before substantial work.
-Default to `auto`; honor an explicit mode without silently changing it.
+State the selected mode and assurance level briefly before substantial work,
+including what selected each. Default to `auto`; honor an explicit mode without
+silently changing it.
 
 | Mode | Implementation | Review |
 | --- | --- | --- |
-| `auto` | Lead by default; delegate a bounded task when it materially helps and applicable instructions permit it | Standard, or final-strict when requested or required |
-| `solo` | Lead only; no subagents | Standard self-review |
-| `solo-reviewed` | Lead only | Fresh independent final-strict reviewer |
+| `auto` | Lead by default; delegate a bounded lane when it materially helps and project instructions permit it | Standard, or final-strict when requested or required |
+| `solo` | Lead only; no subagents at all | Standard self-review |
+| `solo-reviewed` | Lead only; no implementation worker | Always final-strict, by a fresh independent reviewer |
 | `team` | At least one bounded implementation worker, alongside useful lead work | Standard, or final-strict when requested or required |
 
-If a requested mode cannot be honored because delegation is unavailable or an
-independent review conflicts with `solo`, explain the conflict and ask for a
-compatible choice before dependent work. Do not report a different mode as satisfied.
+The lead never delegates orchestration. Decomposition, conflict resolution,
+integration, verification, and the user-facing summary stay with the lead in
+every mode.
 
-Use the current lead model and user-selected reasoning effort. Do not require a
-particular model identity unless the user or applicable project instructions do.
-For delegated work, prefer available `terra_worker` roles for coupled or ambiguous
-implementation, `luna_worker` roles for fully specified mechanical edits, and the
-`fresh_reviewer` role for independent review, when those roles fit the
-project. Otherwise use an available general implementation or review agent.
-Inherit model settings unless an applicable instruction specifies them.
+Assurance and mode are separate axes. `team` does **not** imply final-strict;
+`solo-reviewed` always does. Every mode still honors the project's own review
+requirements — if repository instructions require a review gate for the code in
+play, apply it even in `auto` or `solo`, and if that conflicts with `solo`, raise
+the conflict before implementing.
+
+If a requested mode cannot be honored — delegation is unavailable, no reviewer
+agent exists, or independent review conflicts with `solo` — explain the specific
+limitation and ask for a compatible choice before doing dependent work. Never
+report a different mode as satisfied, and never quietly downgrade one.
+
+## Models
+
+Use the current lead model and the user's selected reasoning effort. Do not
+require a particular model identity, and do not ask the user to switch, unless
+the user or the applicable project instructions say so.
+
+When delegating, read [delegation](references/delegation.md) for role selection,
+ownership, context isolation, and verification packets.
 
 ## Implementation and verification
 
-1. Turn the request into observable acceptance criteria. Identify assumptions and
-   material uncertainty; investigate what can be resolved without user input.
-2. Follow project planning requirements when planning is requested. Otherwise use
-   a brief plan proportional to complexity and proceed with authorized work.
+1. Turn the request into observable acceptance criteria. Name assumptions and
+   material uncertainty; resolve what you can without asking the user.
+2. Follow the project's planning requirements when planning is requested.
+   Otherwise use a brief plan proportional to complexity — `step → verify: check`
+   — and proceed with authorized work.
 3. For behavior changes, establish a focused failing test or reproducible failure
-   before the fix when feasible; follow stricter project TDD requirements. For new
-   behavior, test the acceptance criteria. Documentation or configuration changes
-   use appropriate structural and behavioral checks instead of artificial tests.
+   before the fix when feasible; follow stricter project TDD requirements where
+   they exist. For new behavior, test the acceptance criteria. Documentation and
+   configuration changes use structural and behavioral checks instead of
+   artificial tests.
 4. Make focused changes, preserve unrelated work, and run relevant checks. Expand
-   testing when shared behavior, failures, or unresolved risks justify it.
-5. Review the integrated diff against acceptance criteria. Report what changed,
-   verification results, and any remaining blockers or unverified behavior.
-
-## Delegation contract
-
-When the spawn tool supports `fork_turns`, set `fork_turns: "none"` for
-workers and reviewers so their context matches the self-contained packet.
-For other runtimes, use their supported fresh-context mechanism. Do not assume
-that a new agent automatically excludes the parent conversation.
-
-Give each worker a bounded objective, owned files or responsibilities, acceptance
-criteria, relevant project instructions, dependencies, and verification commands.
-Tell workers they share the codebase and must preserve others' changes. Avoid
-concurrent writes to the same files; sequence dependent work. Respect available
-concurrency and keep the lead responsible for integration and verification.
+   testing when shared behavior, failures, or unresolved risk justify it.
+5. Review the integrated diff yourself against the acceptance criteria — a
+   worker's report is a claim, not evidence. Report what changed, verification
+   results, and any remaining blockers or unverified behavior.
 
 ## Final-strict review
 
-Required for `solo-reviewed`, and when the user or project explicitly requires it.
-Use a fresh read-only reviewer who did not implement the candidate; prefer the
-`fresh_reviewer` role when it is available, otherwise another suitable
-read-only review role or a general agent. Supply the request, applicable
-instructions, candidate diff, and verification evidence. Review correctness,
-regressions, scope, and missing acceptance evidence.
+For `solo-reviewed`, or when the user/project requires independent review, read
+[the final-strict review procedure](references/final-strict-review.md). Preserve
+fresh-context independence, the review-round budget, and the incomplete-gate
+reporting rules. Self-review does not satisfy this assurance level.
 
-Resolve material findings, rerun affected checks, and have the reviewer reassess
-changed areas. Keep follow-up review focused on findings and new changes.
+## Finishing
 
-Target one review round, with a hard maximum of three rounds per assurance unit
-(the declared change scope being reviewed). A project may set a lower limit;
-otherwise the limit is three. Count every review invocation that begins,
-including a new reviewer spawn or a follow-up reassessment by an existing
-reviewer. Fixes and retries within the same scope do not reset the budget, and
-do not switch reviewers to obtain a more favorable verdict.
-
-If material blockers remain when the budget is exhausted, or independent review
-is unavailable, report that the gate is incomplete. A passing third round may
-complete the gate; reaching the limit alone is never approval.
+Follow the project's completion rules — contract/doc updates, its documentation
+check, and its "done" bar. Never report done without the project's own passing
+check.

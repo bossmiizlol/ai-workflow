@@ -1,16 +1,6 @@
 ---
 name: deslopify
-description: >
-  De-slop pass for any text. Scans for the statistical fingerprints of AI
-  writing (negative parallelism / "not X but Y", em-dash density,
-  rule-of-three, false ranges, puffery vocabulary, uniform cadence, hedged
-  both-sidesing), rewrites by meaning, then re-scans until the text is clean
-  and sits in the right register for its genre: academic article, tweet,
-  reddit post, email, blog, docs, marketing. Use when the user says
-  "deslopify", "deslop", "de-slop this", "fuck slop", "f*ck slop", "remove
-  the AI tells", "humanize this", "make this not sound like AI", or invokes
-  /deslopify (or the old /fuck-slop name). Also use before publishing any
-  agent-drafted prose.
+description: "Edit prose to remove formulaic AI phrasing when requested, or before publishing agent-drafted text."
 ---
 
 # Deslopify
@@ -43,7 +33,7 @@ Produce a finding list: line or sentence, matched pattern, tell category. Then r
 - **Cadence.** Flag any run of 3+ consecutive sentences within ±4 words of the same length, and any paragraph where every sentence has the same shape (subject, verb, elaboration).
 - **Formatting.** Bold scattered through prose, emoji-decorated headers or bullets, "**Term:** definition" bullet lists, headers on a text too short to need them, a tidy intro-three-points-conclusion skeleton.
 
-Report the findings to the user as a short table before rewriting: category, count, worst example. The user should see the diagnosis.
+Keep findings internal by default. Show a concise diagnosis table only when the user requests an audit or explanation of edits. Routine pre-publication checks should not add diagnostic output to the deliverable.
 
 ## Phase 2: Rewrite by meaning
 
@@ -85,4 +75,4 @@ Re-run the full Phase 1 scan on your rewritten text. Expect the rewrite to carry
 
 Check the clean text against its genre profile in [references/voices.md](references/voices.md): right length, right formality, right person, genre-specific tells gone. On reddit that means no bold and no bullet essay. In academic prose it means no first-person hot takes added. Then read it aloud. Anywhere you wouldn't say it to the actual audience, rewrite that sentence.
 
-Deliver the rewritten text and a short change log: categories fixed, counts, and how many verify passes it took.
+Deliver the rewritten text. Include a short change log or scan counts only when requested; preserve any required delivery format.

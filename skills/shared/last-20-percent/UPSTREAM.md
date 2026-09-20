@@ -19,7 +19,7 @@ Local adaptations:
   `_emphasis_`. The instruction text is otherwise unchanged.
 
 - Recorded upstream `SKILL.md` SHA-256: `3eceb2337621e8d57598cc16951c4b08d6fdd0d658a72c00c340121780f77491`
-- Installed `SKILL.md` SHA-256: `81755198c70993b480e8c6caba1ed1dc22564c9cdb1c71ff4ed11443401e64c1`
+- Installed `SKILL.md` SHA-256: `74941226dc48d93d3d842b21d3cd45b12b3f102ce07ce0360da94cc028788e0d`
 - Recorded upstream `references/last-20-catalog.md` SHA-256: `48d81c24baaf621156c21770c24416316ddfbf1139f03cf94568c4606e0c3872`
 - Installed `references/last-20-catalog.md` SHA-256: `b87dd7b2a4e643bee21c64163269e0aeb6292e27508e832f9f871e6ac24d05fc`
 - Copyright (c) 2026 Julius Brussee
@@ -29,3 +29,12 @@ with this installation, preserve the local adaptations and license, and record t
 new baseline and installed digests. No skills lockfile is required. Run
 `~/.config/ai-workflow/.venv/bin/python ~/.config/ai-workflow/test_global_setup.py -v`
 to check the installed digest and file connections; this does not check upstream freshness.
+
+## Installed-content audit — 2026-09-20
+
+Compared the installed SKILL.md with the recorded upstream commit and verified
+the downloaded upstream SHA-256 before reviewing the diff. The upstream baseline
+was not upgraded. This records current local adaptations, not their original
+edit dates.
+
+The description requires a requested last-mile or experiential review, avoiding automatic activation on every build or completion check. The body retains the upstream workflow with Markdown formatting changes.

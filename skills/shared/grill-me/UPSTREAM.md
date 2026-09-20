@@ -11,17 +11,17 @@ and at the recorded commit above.
 
 Local adaptations add document-backed review, which upstream does not have:
 
-- `description` gains the sentence directing document-backed review to the
-  domain reference.
+- `description` is concise and limits invocation to a requested interview or challenge.
 - `SKILL.md` gains a `## Document-backed review` section above `## Core Rules`,
-  linking that reference. The calibration and question loop is unchanged.
+  linking that reference. The question loop retains adaptive pressure; target and
+  calibration handling now reuse conversation context as described below.
 - `references/domain-review.md` is local, not vendored. It is written to be
   project-independent: it locates whatever domain definitions, contracts and
   decision records the current project keeps, rather than assuming a filename,
   and it respects read-only files.
 
 - Recorded upstream `SKILL.md` SHA-256: `fb51ed1c9ade960e75ce781c4da411939c24a61a06d21c04060ee0e7660e673b`
-- Installed `SKILL.md` SHA-256: `28e97f1e30be0b98d2899be0e9a56d2f479be4128c07a7c7d29b744df2987d4a`
+- Installed `SKILL.md` SHA-256: `946f633efb66ce79b5801e05e5c594ea3057fa11538a179305e25a139a52d652`
 - Installed `references/domain-review.md` SHA-256 (local, no upstream counterpart): `d817207186893e0ddd4557f1944b048003a3bb6e1c9c066ef1fee3f444bb594f`
 - Copyright (c) 2026 Julius Brussee
 
@@ -31,3 +31,12 @@ license, and record the new baseline and installed digests. No skills lockfile i
 required. Run
 `~/.config/ai-workflow/.venv/bin/python ~/.config/ai-workflow/test_global_setup.py -v`
 to check the installed digest and file connections; this does not check upstream freshness.
+
+## Installed-content audit — 2026-09-20
+
+Compared the installed SKILL.md with the recorded upstream commit and verified
+the downloaded upstream SHA-256 before reviewing the diff. The upstream baseline
+was not upgraded. This records current local adaptations, not their original
+edit dates.
+
+The description triggers on a requested interview or challenge. Document-backed review remains a local addition via references/domain-review.md. On 2026-09-20, target confirmation and repeated calibration were removed when context supplies the answer; missing calibration defaults to Working/Standard unless clarification materially changes the interview.

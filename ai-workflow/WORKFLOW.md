@@ -14,11 +14,16 @@ Do not import assumptions, paths, database names or workflows from another proje
 - Reuse existing components and utilities; add abstractions when real reuse warrants it.
 - For behavior changes, use the project's tests and the personal
   test-driven-development skill together with any required repository supplement.
-  For failures, use diagnosing-bugs to establish a reproducible signal first.
+  For unclear causes, hard-to-reproduce failures or performance regressions, use
+  diagnosing-bugs. For an already-reproduced local failure with a clear cause, reuse
+  the existing signal and investigate the affected path directly.
 - Documentation and configuration-only work needs relevant validation, not invented
   application tests. Run focused checks and report what they do and do not prove.
-- Review tools such as grill-me, junior-to-senior and last-20-percent apply when the
-  user asks for their kind of review. Do not attach a review workflow to every task.
+- Review tools such as grill-me, junior-to-senior, last-20-percent and
+  improve-codebase-architecture apply when the user asks for their kind of review.
+  Do not attach a review workflow to every task. handoff and
+  improve-codebase-architecture are explicit-invocation only, so they never appear
+  in a tool's automatic skill list.
 - Keep secrets and credentials out of responses, logs and committed files. Read only
   what the task requires and follow any repository file-reading restrictions.
 - Complete authorized reversible work without repeated permission questions. Confirm
@@ -34,10 +39,9 @@ Before a destructive reset, verify a durable backup of changes and local-only da
 
 ## Tool integration
 
-Use the Goal workflow when the user explicitly invokes Goal or requests its modes
-or delegation, if that tool has the installed goal skill. Configuration inspection
-and edits alone do not activate Goal. Preserve the user's selected model and mode;
-report missing capabilities rather than silently substituting another workflow.
+Each tool's entry file states when the Goal workflow activates. Preserve the
+user's selected model and mode; report missing capabilities rather than silently
+substituting another workflow.
 
 ## Skill selection
 

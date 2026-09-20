@@ -1,6 +1,6 @@
 ---
 name: junior-to-senior
-description: Adversarial senior-engineer review for agent-generated plans, designs, and architectures. Treats the current output as junior work, constructs a senior reviewer whose domain expertise comes from live codebase research plus web research of current best practices, diagnoses altitude failures (too vague or too granular), then rewrites the plan into a scoped, state-of-the-art version. Use when the user says "junior to senior", "senior review", "review this like a staff engineer", or explicitly requests an adversarial review of a plan. Do not invoke automatically for ordinary planning or implementation.
+description: "Provide an adversarial senior review of a plan, design, or architecture when the user explicitly requests it."
 ---
 
 # Junior to Senior
@@ -26,7 +26,13 @@ Identify exactly what is under review:
 - A pasted plan, design doc, RFC, or issue description.
 - A planning document in the repo the user points at.
 
-Freeze it. Quote or restate the artifact in full before reviewing so the review targets a fixed text, not a moving memory of it. If there is no artifact yet, say so and offer to either generate the junior draft first or review the user's existing idea — do not review thin air.
+Identify a stable review target: the file path and revision or content hash for a
+file, or the specific message for an artifact already in the conversation. Read the
+artifact in full, but quote only passages needed to support findings. Do not repeat
+the whole artifact in the review output or create a duplicate file just to freeze it.
+If the source changes during review, identify the new version and reassess affected
+findings. If no artifact exists, establish whether the user wants an initial draft
+or a review of the stated idea before proceeding.
 
 ## Phase 1: Construct the senior
 
