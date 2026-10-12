@@ -1,6 +1,6 @@
 name = "terra_worker"
-description = "Judgment-lane implementation worker using GPT-5.6 Terra for bounded work in any project that is coupled, ambiguous, multi-file, or architecture-sensitive."
-model = "gpt-5.6-terra"
+description = "Judgment-lane implementation worker using GPT-6 Sol for bounded work in any project that is coupled, ambiguous, multi-file, or architecture-sensitive."
+model = "gpt-6-sol"
 model_reasoning_effort = "high"
 nickname_candidates = ["Terra", "Judgment Lane", "Terra Worker"]
 

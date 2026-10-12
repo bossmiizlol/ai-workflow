@@ -3,6 +3,21 @@
 Applies to every project. Repository instructions win over this file for domain
 rules, architecture, commands, plan format, and language.
 
+## Workflow selection
+
+Use one primary workflow per task. An explicit request to use pstack or
+poteto-mode selects pstack; delegation or mode words in that same request do
+not also activate Goal. An explicit Goal request selects Goal. Keep the chosen
+workflow for follow-ups until the user switches it. Merely comparing or editing
+workflows selects neither. If the user explicitly requests both as primary
+workflows, clarify the intended primary before dependent work.
+
+When pstack is selected, read
+`{{WORKFLOW_DIR}}/pstack-compatibility.md` alongside its
+installed instructions. Use pstack only when explicitly selected during this
+trial; keep automatic routing off. Existing Goal triggers apply when no primary
+workflow has been selected.
+
 ## Goal workflow
 
 For software-development requests that begin with `Goal:` or `/goal`, specify

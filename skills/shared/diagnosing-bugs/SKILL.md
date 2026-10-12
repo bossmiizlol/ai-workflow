@@ -7,7 +7,7 @@ description: "Diagnose unclear bugs, hard-to-reproduce failures, or performance 
 
 Use this workflow for hard-to-reproduce bugs, unclear causes, and performance regressions. For an already-reproduced local failure, use the existing signal and investigate the affected path directly.
 
-Read the current repository instructions and locate its relevant architecture or decision records. Follow that project's file-reading policy; do not assume a particular documentation filename.
+Read the current repository instructions and locate its relevant domain glossary, architecture documentation and decision records. Follow that project's file-reading policy; do not assume a particular documentation filename.
 
 ## Redact
 

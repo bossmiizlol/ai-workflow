@@ -12,8 +12,10 @@ For delegated work, prefer these roles when the session offers them:
   be the agent that wrote the code.
 
 If those are unavailable, use a general implementation or review agent the
-session actually has. Inherit model settings unless an instruction specifies
-them.
+session actually has. Apply the entrypoint's Models rules: named roles keep
+configured defaults unless an explicit requirement takes precedence; general
+agents inherit where supported. Check the current spawn schema for restrictions
+on role, model, reasoning effort, and context inheritance.
 
 ## Delegation contract
 

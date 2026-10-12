@@ -1,8 +1,8 @@
 # Upstream provenance
 
-Originally vendored from
-[`obra/superpowers`](https://github.com/obra/superpowers/tree/b36e0829c6d0140e93cfef2ca599b1b07d4a7797/skills/test-driven-development)
-at commit `b36e0829c6d0140e93cfef2ca599b1b07d4a7797`.
+Current upstream baseline
+[`obra/superpowers`](https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/test-driven-development)
+at commit `8ca22dba9a94f28898bbce59f2537ff4d87c747d`.
 This is the recorded vendoring baseline, not a claim of latest upstream.
 
 Local adaptations affect both metadata and instructional text: the trigger includes
@@ -13,8 +13,8 @@ evidence when automation is infeasible, and distinguish that evidence from TDD.
 Stricter repository TDD requirements still apply. The exception list was clarified
 to avoid listing configuration and generated output as both exempt and approval-required.
 
-- Recorded upstream `SKILL.md` SHA-256: `bf1b8216e523851a411e91d429a7c1c2a173e79d88957bc78e348218d50edd54`
-- Installed `SKILL.md` SHA-256: `10c62fa841b2923d3fa04cebb55b62ef84d8c563fc007d0db8131834ebcb7b79`
+- Recorded upstream `SKILL.md` SHA-256: `64b03fce4aee5a97a93160cea8111f3ba13a17b7c001db4bd5836d67fd10705d`
+- Installed `SKILL.md` SHA-256: `078e11ee988249190e6833ebd494c7ae7c38fd8c27b584f5a86cf1b4092f07c3`
 - `writing-good-tests.md` SHA-256: `51471c853306ff92ca8bb41dcaea05f31c0e46b03651f8f3c99754b7172f4ae1`
 - Copyright (c) 2025 Jesse Vincent
 - License: MIT; see `LICENSE`.
@@ -33,3 +33,17 @@ was not upgraded. This records current local adaptations, not their original
 edit dates.
 
 The body is a condensed local rewrite preserving focused failing acceptance tests before behavior changes. Pure refactors use passing regression coverage; documentation, configuration and mechanical changes use appropriate validation. Existing implementation and collaborator work are preserved. Repeatable manual evidence is distinguished from automated TDD, stricter repository requirements remain binding, and test effort scales with affected behavior and evidence.
+
+## Upstream reconciliation — 2026-10-06
+
+Baseline advanced to `8ca22dba9a94f28898bbce59f2537ff4d87c747d`. Compared all files in
+the upstream skill directory; SKILL.md is the only changed upstream file.
+Supporting resources and licenses are retained.
+
+Upstream added a requirement to run the whole project test suite and name every
+observed failure. The personal adaptation requires the project completion gates,
+distinguishes focused checks from a passing full suite, and explicitly reports
+blocked suites and all observed failures. It retains risk-based expansion where
+the project does not require a full suite; unconditional full-suite execution
+is not adopted. Existing work preservation and documentation-only validation
+remain in force.

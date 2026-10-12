@@ -11,8 +11,8 @@ One source of truth lives in this repository:
 
 Both tools see the shared skills through symlinks into ~/.agents/skills, so a
 shared method is edited in exactly one place. Every reference to WORKFLOW.md is
-stored as the placeholder {{WORKFLOW_MD}} and rendered to an absolute path at
-install time, which is what makes the repository portable between machines.
+stored as the placeholder {{WORKFLOW_MD}} (and its directory as {{WORKFLOW_DIR}})
+and rendered to an absolute path at install time, which is what makes the repository portable between machines.
 """
 
 from __future__ import annotations
@@ -28,6 +28,7 @@ import sys
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 TOKEN = "{{WORKFLOW_MD}}"
+DIR_TOKEN = "{{WORKFLOW_DIR}}"
 BEGIN = "<!-- BEGIN shared-ai-workflow -->"
 END = "<!-- END shared-ai-workflow -->"
 
@@ -92,7 +93,11 @@ def paths_overlap(first: Path, second: Path) -> bool:
 
 
 def render(text: str, workflow_md: Path) -> str:
-    return text.replace(TOKEN, str(workflow_md))
+    return text.replace(TOKEN, str(workflow_md)).replace(DIR_TOKEN, str(workflow_md.parent))
+
+
+def unrendered(text: str) -> bool:
+    return TOKEN in text or DIR_TOKEN in text
 
 
 def read_block(path: Path) -> str:
@@ -154,6 +159,8 @@ def build_plan(args: argparse.Namespace) -> tuple[Plan, Path, dict[str, Path]]:
     plan.copies.append((REPO_ROOT / "ai-workflow/WORKFLOW.md", workflow_md, False))
     plan.copies.append((REPO_ROOT / "scripts/test_global_setup.py",
                         dirs["workflow"] / "test_global_setup.py", False))
+    plan.copies.append((REPO_ROOT / "ai-workflow/pstack-compatibility.md",
+                        dirs["workflow"] / "pstack-compatibility.md", False))
 
     for name in SHARED_SKILLS:
         plan.trees.append((REPO_ROOT / "skills/shared" / name, dirs["shared"] / name))
@@ -368,10 +375,10 @@ def main(argv: list[str] | None = None) -> int:
 
     stale = []
     for source, target, do_render in plan.copies:
-        if do_render and TOKEN in target.read_text(encoding="utf-8"):
+        if do_render and unrendered(target.read_text(encoding="utf-8")):
             stale.append(target)
     for entry, _ in plan.blocks:
-        if TOKEN in entry.read_text(encoding="utf-8"):
+        if unrendered(entry.read_text(encoding="utf-8")):
             stale.append(entry)
     if stale:
         print("Unrendered placeholders remain in:")

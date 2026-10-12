@@ -36,6 +36,7 @@ CODEX_AGENTS = (('terra-worker.toml', 'terra_worker'),
 RETIRED_CODEX_AGENTS = ('solweaver-reviewer.toml',)
 CLAUDE_AGENTS = ('sonnet-worker', 'haiku-worker', 'fresh-reviewer')
 TOKEN = '{{WORKFLOW_MD}}'
+DIR_TOKEN = '{{WORKFLOW_DIR}}'
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--home', type=Path, default=Path.home(),
@@ -71,8 +72,10 @@ class GlobalSetupTests(unittest.TestCase):
         installed += [ROOT / '.claude/agents' / f'{role}.md' for role in CLAUDE_AGENTS]
         for path in installed:
             with self.subTest(file=path.name):
-                self.assertNotIn(TOKEN, path.read_text(encoding='utf-8'),
-                                 'install.py did not render the workflow path here')
+                text = path.read_text(encoding='utf-8')
+                for token in (TOKEN, DIR_TOKEN):
+                    self.assertNotIn(token, text,
+                                     'install.py did not render the workflow path here')
 
     def test_shared_skill_metadata_and_local_references(self):
         for name in SHARED_SKILLS:
@@ -203,7 +206,8 @@ class RepositoryParityTests(unittest.TestCase):
     """The installation still matches the repository it came from."""
 
     def rendered(self, relative: str) -> str:
-        return (REPO / relative).read_text(encoding='utf-8').replace(TOKEN, str(WORKFLOW))
+        return ((REPO / relative).read_text(encoding='utf-8')
+                .replace(TOKEN, str(WORKFLOW)).replace(DIR_TOKEN, str(WORKFLOW.parent)))
 
     def test_shared_skills_match_repository(self):
         for name in SHARED_SKILLS:
@@ -219,7 +223,9 @@ class RepositoryParityTests(unittest.TestCase):
     def test_rendered_files_match_repository(self):
         pairs = [('skills/goal/codex/SKILL.md', '.codex/skills/goal/SKILL.md'),
                  ('skills/goal/claude/SKILL.md', '.claude/skills/goal/SKILL.md'),
-                 ('ai-workflow/WORKFLOW.md', '.config/ai-workflow/WORKFLOW.md')]
+                 ('ai-workflow/WORKFLOW.md', '.config/ai-workflow/WORKFLOW.md'),
+                 ('ai-workflow/pstack-compatibility.md',
+                  '.config/ai-workflow/pstack-compatibility.md')]
         pairs += [(f'agents/codex/{name}', f'.codex/agents/{name}') for name, _ in CODEX_AGENTS]
         pairs += [(f'agents/claude/{role}.md', f'.claude/agents/{role}.md')
                   for role in CLAUDE_AGENTS]

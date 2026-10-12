@@ -25,7 +25,8 @@ Two properties make this portable, and both are enforced by the checks:
   `~/.agents/skills`. Both tools reach them through symlinks, so a method is
   edited in exactly one place and never drifts between the two tools.
 - **No absolute paths in the repository.** Every reference to the shared
-  workflow is stored as the placeholder `{{WORKFLOW_MD}}` and rendered to the
+  workflow is stored as the placeholder `{{WORKFLOW_MD}}` (its directory as
+  `{{WORKFLOW_DIR}}`) and rendered to the
   destination user's real home at install time. Nothing has to be hand-edited
   when the home directory changes.
 

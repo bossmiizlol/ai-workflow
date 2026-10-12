@@ -1,6 +1,6 @@
 ---
 name: goal
-description: "Project-independent software goal workflow. Use for requests beginning with Goal: or /goal, for an explicit Mode: auto, solo, solo-reviewed, or team, or when asked to delegate software work to subagents, a team, or parallel workers. Do not activate merely to discuss or edit workflow settings."
+description: "Project-independent software goal workflow. Use for requests beginning with Goal: or /goal, for an explicit Mode: auto, solo, solo-reviewed, or team, or when asked to delegate software work to subagents, a team, or parallel workers. Do not activate for an explicitly selected pstack workflow or merely to discuss or edit workflow settings."
 argument-hint: "[Mode: auto|solo|solo-reviewed|team] <what to build, fix, or change>"
 ---
 
@@ -37,6 +37,11 @@ Include this path and the selected skill paths in delegation packets.
 
 ## Invocation boundary
 
+An explicit pstack or poteto-mode selection uses that workflow alone, even if
+its request also mentions delegation or a Goal mode. Preserve the selected
+workflow across follow-ups until the user switches it. Do not interpret a
+request to compare or configure workflows as invoking them.
+
 Interpret explicit software delegation requests in the user's language, including
 Thai requests such as “แบ่งงานให้ subagents ช่วยแก้บั๊ก”. Merely mentioning Goal,
 quoting a mode, or asking to inspect or edit workflow settings does not activate it.
@@ -71,6 +76,14 @@ report a different mode as satisfied, and never quietly downgrade one.
 
 ## Models
 
+These rules preserve the lead model. For delegates, an explicit user or project
+model requirement takes precedence over role defaults. Otherwise, a preferred
+named agent uses its configured model and effort; a general agent without such
+defaults inherits the lead settings where supported. Inspect the offered agent
+and tool definitions rather than inferring a model from the role name. If a
+fixed role cannot honor an explicit requirement, use a compatible role or report
+the limitation before dispatch. Do not change model defaults as part of routing.
+
 Use the current lead model and the user's selected reasoning effort. Do not
 require a particular model identity, and do not ask the user to switch, unless
 the user or the applicable project instructions say so.
@@ -87,10 +100,10 @@ For delegated work, prefer these agents when the session offers them:
   change; the reviewer must never be the agent that wrote the code.
 
 If those are unavailable, use a general implementation or review agent the
-session actually has. Inherit model settings unless an instruction specifies
-them. To pick a different model for one spawn, pass the Agent tool's `model`
-parameter (one of the values the session offers, such as `sonnet`, `opus`,
-`haiku`, or `fable`); it overrides the agent file's `model` for that call only.
+session actually has and apply the Models rules above.
+To honor an explicit model requirement, use the Agent tool's `model`
+parameter only if the current schema supports it, with a value the session
+offers. Respect any role restrictions that prevent an override.
 
 ## Implementation and verification
 
@@ -124,11 +137,13 @@ In Claude Code, that mechanism is an `Agent` call with a named `subagent_type`
 starts cold. `subagent_type: "fork"` inherits the lead's context, so never use it
 for a worker that must rely on its packet or for any independent review.
 
-Agents run in the background by default, and the lead is notified when one
-finishes. Do not integrate, verify, or review a lane before its completion
-notification arrives, and never predict or summarize a result that has not
-arrived. Pass `run_in_background: false` only when the lead's very next step
-depends on that result and nothing else useful can run meanwhile.
+Use the Agent schema exposed in the current session. With fork mode enabled,
+Claude Code runs spawned agents in the background and omits the
+`run_in_background` parameter. Only request foreground execution when the
+current tool exposes that option and the next step depends on the result.
+Otherwise wait for the completion notification using supported mechanisms.
+Do not integrate, verify, or review a lane before its result arrives, and never
+predict or summarize a result that has not arrived.
 
 To continue an agent with its context intact — sending review findings back to
 the original implementer, or asking a reviewer to reassess — use `SendMessage`

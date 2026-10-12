@@ -40,7 +40,13 @@ Add a regression test from the acceptance criteria and demonstrate it catches th
 original failure in an isolated copy or by reversibly changing only your work.
 Report validation performed after implementation accurately.
 
-Run affected checks first. Expand testing for shared behavior, failures, or
-unresolved risk. Fix regressions introduced by the change and report unrelated
-failures. Once checks pass, rerun only after further changes or new evidence.
-Report commands, results, and remaining gaps without claiming unperformed checks.
+Run affected checks first, then the project's required completion checks. A passing
+focused test does not establish a passing project suite, and a narrow task scope
+does not waive repository verification gates. Expand coverage for shared behavior,
+failures, or unresolved risk. If a required suite cannot run, report its command,
+the blocker, and the coverage gap.
+
+Fix regressions introduced by the change and identify every observed failure in
+the report, including pre-existing or unrelated failures. Once required checks
+pass, rerun only after further changes or new evidence. Report commands, results,
+and remaining gaps without claiming unperformed checks.

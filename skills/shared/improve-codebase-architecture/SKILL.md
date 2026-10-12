@@ -16,7 +16,7 @@ issues, configuration, or dependencies as a side effect of the review.
 
 - Read applicable repository and scoped instructions before exploring. Discover the
   project's actual glossary, architecture records, contracts and test conventions;
-  do not assume CONTEXT.md, an ADR directory, or a particular framework exists.
+  do not assume a particular documentation filename, ADR directory, or framework exists.
   Respect file-reading restrictions and protected/read-only documents.
 - Use the area, pain point or upcoming feature the user supplied. When none is
   supplied, inspect a bounded recent Git history and prioritize recurring changes.

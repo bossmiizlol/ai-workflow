@@ -1,6 +1,6 @@
 name = "fresh_reviewer"
 description = "Independent read-only reviewer for the final gate on a completed change in any project. Spawn once, before delivery, on work it did not write; never for routine mid-task checks."
-model = "gpt-5.6-sol"
+model = "gpt-6-sol"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 nickname_candidates = ["Fresh Eyes", "Last Look", "Second Reader"]

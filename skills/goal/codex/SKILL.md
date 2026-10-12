@@ -1,6 +1,6 @@
 ---
 name: goal
-description: "Project-independent software goal workflow. Use for $goal, software requests beginning with Goal: or /goal, explicit Mode: auto, solo, solo-reviewed, or team, or requests to delegate software work to agents. Do not activate merely to discuss or edit workflow settings."
+description: "Project-independent software goal workflow. Use for $goal, software requests beginning with Goal: or /goal, explicit Mode: auto, solo, solo-reviewed, or team, or requests to delegate software work to agents. Do not activate for an explicitly selected pstack workflow or merely to discuss or edit workflow settings."
 ---
 
 # Goal Workflow
@@ -36,6 +36,11 @@ Include this path and the selected skill paths in delegation packets.
 
 ## Invocation boundary
 
+An explicit pstack or poteto-mode selection uses that workflow alone, even if
+its request also mentions delegation or a Goal mode. Preserve the selected
+workflow across follow-ups until the user switches it. Do not interpret a
+request to compare or configure workflows as invoking them.
+
 Interpret explicit software delegation requests in the user's language, including
 Thai requests such as “แบ่งงานให้ subagents ช่วยแก้บั๊ก”. Merely mentioning Goal,
 quoting a mode, or asking to inspect or edit workflow settings does not activate it.
@@ -69,6 +74,14 @@ limitation and ask for a compatible choice before doing dependent work. Never
 report a different mode as satisfied, and never quietly downgrade one.
 
 ## Models
+
+These rules preserve the lead model. For delegates, an explicit user or project
+model requirement takes precedence over role defaults. Otherwise, a preferred
+named agent uses its configured model and effort; a general agent without such
+defaults inherits the lead settings where supported. Inspect the offered agent
+and tool definitions rather than inferring a model from the role name. If a
+fixed role cannot honor an explicit requirement, use a compatible role or report
+the limitation before dispatch. Do not change model defaults as part of routing.
 
 Use the current lead model and the user's selected reasoning effort. Do not
 require a particular model identity, and do not ask the user to switch, unless
