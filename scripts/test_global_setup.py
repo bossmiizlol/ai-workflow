@@ -19,22 +19,10 @@ import unittest
 
 import yaml
 
-try:  # Python 3.11+
-    import tomllib
-except ModuleNotFoundError:  # pragma: no cover - older interpreters
-    try:
-        import tomli as tomllib  # type: ignore[no-redef]
-    except ModuleNotFoundError:
-        tomllib = None  # type: ignore[assignment]
-
 SHARED_SKILLS = ('test-driven-development', 'diagnosing-bugs', 'grill-me', 'deslopify',
                  'junior-to-senior', 'last-20-percent', 'handoff',
                  'improve-codebase-architecture')
-CODEX_AGENTS = (('terra-worker.toml', 'terra_worker'),
-                ('luna-worker.toml', 'luna_worker'),
-                ('fresh-reviewer.toml', 'fresh_reviewer'))
-RETIRED_CODEX_AGENTS = ('solweaver-reviewer.toml',)
-CLAUDE_AGENTS = ('sonnet-worker', 'haiku-worker', 'fresh-reviewer')
+RETIRED_PATHS = ('.claude/skills/goal', '.claude/agents')
 TOKEN = '{{WORKFLOW_MD}}'
 DIR_TOKEN = '{{WORKFLOW_DIR}}'
 
@@ -48,6 +36,7 @@ ROOT = args.home.expanduser().resolve()
 REPO = args.repo.expanduser().resolve() if args.repo else None
 SHARED = ROOT / '.agents/skills'
 WORKFLOW = ROOT / '.config/ai-workflow/WORKFLOW.md'
+ENTRY = ROOT / '.claude/CLAUDE.md'
 
 
 def frontmatter(path: Path) -> dict:
@@ -55,27 +44,15 @@ def frontmatter(path: Path) -> dict:
 
 
 class GlobalSetupTests(unittest.TestCase):
-    def test_shared_workflow_is_reachable_from_both_entry_files(self):
+    def test_shared_workflow_is_reachable_from_the_entry_file(self):
         self.assertTrue(WORKFLOW.is_file(), f'missing {WORKFLOW}')
-        for relative in ('.codex/AGENTS.md', '.claude/CLAUDE.md'):
-            with self.subTest(file=relative):
-                text = (ROOT / relative).read_text(encoding='utf-8')
-                self.assertIn(str(WORKFLOW), text,
-                              'entry file does not point at the shared workflow')
-        self.assertFalse((ROOT / '.codex/AGENTS.override.md').exists(),
-                         'Global override masks the maintained AGENTS.md; review it explicitly.')
+        self.assertIn(str(WORKFLOW), ENTRY.read_text(encoding='utf-8'),
+                      'entry file does not point at the shared workflow')
 
     def test_no_unrendered_placeholders(self):
-        installed = [ROOT / '.codex/AGENTS.md', ROOT / '.claude/CLAUDE.md',
-                     ROOT / '.codex/skills/goal/SKILL.md', ROOT / '.claude/skills/goal/SKILL.md']
-        installed += [ROOT / '.codex/agents' / name for name, _ in CODEX_AGENTS]
-        installed += [ROOT / '.claude/agents' / f'{role}.md' for role in CLAUDE_AGENTS]
-        for path in installed:
-            with self.subTest(file=path.name):
-                text = path.read_text(encoding='utf-8')
-                for token in (TOKEN, DIR_TOKEN):
-                    self.assertNotIn(token, text,
-                                     'install.py did not render the workflow path here')
+        text = ENTRY.read_text(encoding='utf-8')
+        for token in (TOKEN, DIR_TOKEN):
+            self.assertNotIn(token, text, 'install.py did not render the workflow path here')
 
     def test_shared_skill_metadata_and_local_references(self):
         for name in SHARED_SKILLS:
@@ -89,24 +66,6 @@ class GlobalSetupTests(unittest.TestCase):
                     if not target.startswith(('http:', 'https:', '#')):
                         self.assertTrue((path.parent / target.split('#')[0]).exists(), target)
 
-    def test_openai_skill_metadata(self):
-        for name in SHARED_SKILLS:
-            path = SHARED / name / 'agents/openai.yaml'
-            if not path.exists():
-                continue
-            with self.subTest(skill=name):
-                data = yaml.safe_load(path.read_text(encoding='utf-8'))
-                self.assertIsInstance(data, dict)
-                if 'interface' in data:
-                    self.assertIsInstance(data['interface'], dict)
-                    for key in ('display_name', 'short_description'):
-                        self.assertIsInstance(data['interface'][key], str)
-                        self.assertTrue(data['interface'][key].strip())
-                if 'policy' in data:
-                    self.assertIsInstance(data['policy'], dict)
-                    if 'allow_implicit_invocation' in data['policy']:
-                        self.assertIsInstance(data['policy']['allow_implicit_invocation'], bool)
-
     def test_claude_skill_links(self):
         for name in SHARED_SKILLS:
             path = ROOT / '.claude/skills' / name
@@ -115,78 +74,19 @@ class GlobalSetupTests(unittest.TestCase):
                                 'Claude must read the shared skill, not a copy of it')
                 self.assertEqual(path.resolve(strict=True), (SHARED / name).resolve(strict=True))
 
-    def test_codex_skill_links(self):
-        """Codex discovers skills in $CODEX_HOME/skills, so the shared folder must be linked there too."""
-        for name in SHARED_SKILLS:
-            path = ROOT / '.codex/skills' / name
-            with self.subTest(skill=name):
-                self.assertTrue(path.is_symlink(),
-                                'Codex must read the shared skill, not a copy of it')
-                self.assertEqual(path.resolve(strict=True), (SHARED / name).resolve(strict=True))
-
-    def test_goal_integrations(self):
-        for tool in ('.codex', '.claude'):
-            path = ROOT / tool / 'skills/goal/SKILL.md'
-            with self.subTest(tool=tool):
-                metadata = frontmatter(path)
-                self.assertEqual(metadata['name'], 'goal')
-                self.assertTrue(metadata['description'])
-                self.assertIn(str(WORKFLOW), path.read_text(encoding='utf-8'))
-                for target in re.findall(r'\[[^\]]*\]\(([^)]+)\)', path.read_text(encoding='utf-8')):
-                    if not target.startswith(('http:', 'https:', '#')):
-                        self.assertTrue((path.parent / target.split('#')[0]).is_file(), target)
-
     def test_explicit_only_skills(self):
         for name in ('handoff', 'improve-codebase-architecture'):
             with self.subTest(skill=name):
                 directory = SHARED / name
                 self.assertIs(frontmatter(directory / 'SKILL.md')['disable-model-invocation'], True)
-                metadata = yaml.safe_load((directory / 'agents/openai.yaml').read_text())
-                self.assertIs(metadata['policy']['allow_implicit_invocation'], False)
-
-    def test_claude_agent_definitions(self):
-        for role in CLAUDE_AGENTS:
-            path = ROOT / '.claude/agents' / f'{role}.md'
-            with self.subTest(agent=role):
-                data = frontmatter(path)
-                self.assertEqual(data['name'], role)
-                self.assertIsInstance(data['description'], str)
-                self.assertTrue(data['description'].strip())
-                self.assertIsInstance(data['model'], str)
-                self.assertTrue(data['model'].strip())
-                self.assertIsInstance(data['tools'], str)
-                tools = {tool.strip() for tool in data['tools'].split(',')}
-                self.assertIn('Read', tools)
-                if role == 'fresh-reviewer':
-                    self.assertLessEqual(tools, {'Read', 'Grep', 'Glob', 'Bash'})
-
-    @unittest.skipIf(tomllib is None, 'needs Python 3.11+ or tomli for TOML checks')
-    def test_codex_agent_definitions(self):
-        for filename, role in CODEX_AGENTS:
-            with self.subTest(agent=role):
-                data = tomllib.loads((ROOT / '.codex/agents' / filename).read_text(encoding='utf-8'))
-                self.assertEqual(data['name'], role)
-                self.assertTrue(data['developer_instructions'])
-                if role == 'fresh_reviewer':
-                    self.assertEqual(data['sandbox_mode'], 'read-only')
-
-    @unittest.skipIf(tomllib is None, 'needs Python 3.11+ or tomli for TOML checks')
-    def test_shared_skills_not_disabled(self):
-        path = ROOT / '.codex/config.toml'
-        config = tomllib.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
-        maintained = {(SHARED / name / 'SKILL.md').resolve() for name in SHARED_SKILLS}
-        for entry in config.get('skills', {}).get('config', []):
-            if entry.get('enabled', True) is False:
-                disabled = Path(entry['path']).expanduser().resolve()
-                self.assertNotIn(disabled, maintained,
-                                 'A maintained shared skill is disabled globally.')
 
     def test_retired_definitions_are_gone(self):
-        """A role this setup no longer ships must not linger and be offered."""
-        for name in RETIRED_CODEX_AGENTS:
-            path = ROOT / '.codex/agents' / name
-            with self.subTest(agent=name):
-                self.assertFalse(path.exists(), f'retired definition still installed: {path}')
+        """A skill or role this setup no longer ships must not linger and be offered."""
+        for relative in RETIRED_PATHS:
+            path = ROOT / relative
+            with self.subTest(path=relative):
+                self.assertFalse(path.exists() or path.is_symlink(),
+                                 f'retired definition still installed: {path}')
 
     def test_installed_provenance_digests(self):
         for name in SHARED_SKILLS:
@@ -221,36 +121,17 @@ class RepositoryParityTests(unittest.TestCase):
                     self.assertEqual(installed.read_bytes(), path.read_bytes())
 
     def test_rendered_files_match_repository(self):
-        pairs = [('skills/goal/codex/SKILL.md', '.codex/skills/goal/SKILL.md'),
-                 ('skills/goal/claude/SKILL.md', '.claude/skills/goal/SKILL.md'),
-                 ('ai-workflow/WORKFLOW.md', '.config/ai-workflow/WORKFLOW.md'),
+        pairs = [('ai-workflow/WORKFLOW.md', '.config/ai-workflow/WORKFLOW.md'),
                  ('ai-workflow/pstack-compatibility.md',
                   '.config/ai-workflow/pstack-compatibility.md')]
-        pairs += [(f'agents/codex/{name}', f'.codex/agents/{name}') for name, _ in CODEX_AGENTS]
-        pairs += [(f'agents/claude/{role}.md', f'.claude/agents/{role}.md')
-                  for role in CLAUDE_AGENTS]
         for source, installed in pairs:
             with self.subTest(file=installed):
                 self.assertEqual((ROOT / installed).read_text(encoding='utf-8'),
                                  self.rendered(source))
 
-    def test_goal_resources_match_repository(self):
-        for tool in ('codex', 'claude'):
-            source = REPO / 'skills/goal' / tool
-            for path in sorted(source.rglob('*')):
-                if not path.is_file() or path.name == '.DS_Store':
-                    continue
-                installed = ROOT / f'.{tool}/skills/goal' / path.relative_to(source)
-                with self.subTest(file=str(installed)):
-                    self.assertTrue(installed.is_file(), installed)
-                    self.assertEqual(installed.read_text(), self.rendered(str(path.relative_to(REPO))))
-
-    def test_entry_blocks_present(self):
-        for source, installed in (('entry/codex-AGENTS.md', '.codex/AGENTS.md'),
-                                  ('entry/claude-CLAUDE.md', '.claude/CLAUDE.md')):
-            with self.subTest(file=installed):
-                body = self.rendered(source).strip('\n')
-                self.assertIn(body, (ROOT / installed).read_text(encoding='utf-8'))
+    def test_entry_block_present(self):
+        body = self.rendered('entry/claude-CLAUDE.md').strip('\n')
+        self.assertIn(body, ENTRY.read_text(encoding='utf-8'))
 
 
 if __name__ == '__main__':

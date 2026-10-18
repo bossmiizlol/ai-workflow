@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS - not the current workspace.
 
-Include a "suggested skills" section with each relevant skill name and source path. Use the next tool's invocation syntax (`/skill-name` in Claude Code, `$skill-name` in Codex). If that tool does not expose the skill, identify the missing dependency instead of assuming it has Claude's Skill tool.
+Include a "suggested skills" section with each relevant skill name, source path, and `/skill-name` invocation. If the next session does not expose a skill, identify the missing dependency instead of assuming it is available.
 
 Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
 

@@ -10,19 +10,24 @@ precedence.
 
 Treat the tools and agent definitions exposed in the current session as the
 source of truth. Plugin tool mappings are guidance, not proof of availability.
-On Codex, use the exposed shell and web tools instead of assuming tools literally
-named `shell` or `web_search` exist. Use a structured user-input tool when it is
-available and permitted in the current mode; otherwise ask in text.
+Use a structured user-input tool when it is available and permitted in the
+current mode; otherwise ask in text. Check current agent status and use the
+supported wait, follow-up, or interrupt operation for the intended action. Use
+available task tracking, or the playbook's local checklist fallback.
 
-Use only available agent lifecycle operations. Do not call `close_agent` or
-claim a concurrency slot was freed unless the runtime supports and confirms it.
-Check current agent status and use the supported wait, follow-up, or interrupt
-operation for the intended action. Interruption is not equivalent to closing.
-Use available task tracking, or the playbook's local checklist fallback.
-
-On Claude Code, inspect the Agent schema before passing `run_in_background`.
+Inspect the Agent schema before passing `run_in_background`.
 Fork mode may remove this option and run spawned agents in the background.
 Await actual completion rather than assuming a foreground call is available.
+
+## Overlapping skills
+
+When pstack is selected, use pstack's own skill for a method it covers, even
+when a personal global skill covers the same method. This replaces the shared
+"prefer the personal global skill" rule for that task only. Current overlaps:
+`pstack:tdd` over `test-driven-development`, `pstack:unslop` over `deslopify`,
+and `pstack:interrogate` over `junior-to-senior`. Global skills with no pstack
+equivalent (`diagnosing-bugs`, `grill-me`, `handoff`, `last-20-percent`,
+`improve-codebase-architecture`) stay available under their usual triggers.
 
 ## Models and delegation
 
@@ -40,7 +45,7 @@ supplement and applicable personal/project instruction paths in delegate packets
 
 ## Maintenance
 
-Keep `session hook: off` in each runtime's pstack-models.md during the trial.
+Keep `session hook: off` in `~/.claude/pstack-models.md`.
 Do not modify vendor cache files to apply these adaptations. After updating the
 plugin, compare its runtime mapping with current tool schemas and remove local
 adaptations that are no longer needed. Check named skill dependencies when a

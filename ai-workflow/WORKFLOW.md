@@ -39,8 +39,8 @@ Before a destructive reset, verify a durable backup of changes and local-only da
 
 ## Tool integration
 
-Each tool's entry file states when the Goal workflow activates. Preserve the
-user's selected model and mode; report missing capabilities rather than silently
+The entry file states when pstack activates. Preserve the user's
+selected model and mode; report missing capabilities rather than silently
 substituting another workflow.
 
 ## Skill selection
@@ -57,12 +57,8 @@ supplements as well; their domain constraints and stricter requirements still ap
 A project supplement adds local requirements to the shared method.
 
 Resolve the global skill from the current tool's available skills and read that
-source explicitly. Do not assume Codex and Claude discover the same directories.
-Same-name skills are not automatically merged or overridden. This selection rule
+source explicitly. Same-name skills are not automatically merged or overridden. This selection rule
 does not change the tool's instruction precedence or skill discovery behavior.
 If the global skill is unavailable, use an applicable repository skill or its
 stated fallback and report the limitation. If neither provides the required
 workflow, report the missing dependency before running it.
-
-For tool-specific Goal integrations, use the Goal skill installed for the current
-tool unless the user or repository explicitly selects another compatible source.

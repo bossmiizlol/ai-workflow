@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-"""Install the shared personal AI workflow for Codex and Claude Code.
+"""Install the shared personal AI workflow for Claude Code.
 
 One source of truth lives in this repository:
 
-  ai-workflow/WORKFLOW.md      shared working agreements both tools read
+  ai-workflow/WORKFLOW.md      shared working agreements Claude reads
   skills/shared/<name>         generic skills, installed once into ~/.agents/skills
-  skills/goal/<tool>/         the per-tool Goal workflow skill and references
-  agents/<tool>/<file>         per-tool subagent role definitions
-  entry/<tool>-<FILE>          the block merged into each tool's entry instructions
+  entry/claude-CLAUDE.md       the block merged into ~/.claude/CLAUDE.md
 
-Both tools see the shared skills through symlinks into ~/.agents/skills, so a
+Claude sees the shared skills through symlinks into ~/.agents/skills, so a
 shared method is edited in exactly one place. Every reference to WORKFLOW.md is
 stored as the placeholder {{WORKFLOW_MD}} (and its directory as {{WORKFLOW_DIR}})
 and rendered to an absolute path at install time, which is what makes the repository portable between machines.
@@ -42,11 +40,9 @@ SHARED_SKILLS = (
     "handoff",
     "improve-codebase-architecture",
 )
-CODEX_AGENTS = ("terra-worker.toml", "luna-worker.toml", "fresh-reviewer.toml")
-# Definitions this setup used to install. An upgrade retires them instead of
-# leaving a stale role behind for the tool to offer.
-RETIRED_CODEX_AGENTS = ("solweaver-reviewer.toml",)
-CLAUDE_AGENTS = ("sonnet-worker.md", "haiku-worker.md", "fresh-reviewer.md")
+# Skills and roles this setup used to install. An upgrade retires them instead of
+# leaving a stale one behind for Claude to offer.
+RETIRED = ("skills/goal", "agents")
 
 IGNORE = shutil.ignore_patterns("__pycache__", "*.py[co]", ".DS_Store")
 
@@ -132,8 +128,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="Shared workflow directory (default: <home>/.config/ai-workflow).")
     parser.add_argument("--shared-skills-dir", type=Path, default=None,
                         help="Shared skills directory (default: <home>/.agents/skills).")
-    parser.add_argument("--codex-home", type=Path, default=None,
-                        help="Codex configuration directory (default: <home>/.codex).")
     parser.add_argument("--claude-home", type=Path, default=None,
                         help="Claude Code configuration directory (default: <home>/.claude).")
     parser.add_argument("--upgrade", action="store_true",
@@ -148,7 +142,6 @@ def build_plan(args: argparse.Namespace) -> tuple[Plan, Path, dict[str, Path]]:
     dirs = {
         "workflow": (args.workflow_dir or home / ".config/ai-workflow"),
         "shared": (args.shared_skills_dir or home / ".agents/skills"),
-        "codex": (args.codex_home or home / ".codex"),
         "claude": (args.claude_home or home / ".claude"),
     }
     dirs = {key: path.expanduser().resolve(strict=False) for key, path in dirs.items()}
@@ -165,26 +158,10 @@ def build_plan(args: argparse.Namespace) -> tuple[Plan, Path, dict[str, Path]]:
     for name in SHARED_SKILLS:
         plan.trees.append((REPO_ROOT / "skills/shared" / name, dirs["shared"] / name))
         plan.links.append((dirs["claude"] / "skills" / name, dirs["shared"] / name))
-        plan.links.append((dirs["codex"] / "skills" / name, dirs["shared"] / name))
 
-    for tool in ("codex", "claude"):
-        source_dir = REPO_ROOT / "skills/goal" / tool
-        plan.copies.append((source_dir / "SKILL.md",
-                            dirs[tool] / "skills/goal/SKILL.md", True))
-        for source in sorted((source_dir / "references").rglob("*.md")):
-            plan.copies.append((source, dirs[tool] / "skills/goal" / source.relative_to(source_dir), True))
+    for relative in RETIRED:
+        plan.retire.append(dirs["claude"] / relative)
 
-    for name in CODEX_AGENTS:
-        plan.copies.append((REPO_ROOT / "agents/codex" / name,
-                            dirs["codex"] / "agents" / name, True))
-    for name in CLAUDE_AGENTS:
-        plan.copies.append((REPO_ROOT / "agents/claude" / name,
-                            dirs["claude"] / "agents" / name, True))
-
-    for name in RETIRED_CODEX_AGENTS:
-        plan.retire.append(dirs["codex"] / "agents" / name)
-
-    plan.blocks.append((dirs["codex"] / "AGENTS.md", REPO_ROOT / "entry/codex-AGENTS.md"))
     plan.blocks.append((dirs["claude"] / "CLAUDE.md", REPO_ROOT / "entry/claude-CLAUDE.md"))
 
     return plan, workflow_md, dirs
@@ -391,12 +368,12 @@ def main(argv: list[str] | None = None) -> int:
                             "--home", str(args.home.expanduser().resolve(strict=False)), "-v"])
     print()
     print(f"Shared workflow: {workflow_md}")
-    print(f"Shared skills:   {dirs['shared']}  (both tools read them through symlinks)")
+    print(f"Shared skills:   {dirs['shared']}  (Claude reads them through symlinks)")
     print("Next:")
     print(f"  1. Validate with: {validator}")
-    print("  2. Restart Codex and start a new Claude Code session; both read")
-    print("     instructions, agents and skills at session start.")
-    print("  3. In a fresh session of each tool, ask it to list the instruction and")
+    print("  2. Start a new Claude Code session; it reads instructions and skills")
+    print("     at session start.")
+    print("  3. In a fresh session, ask it to list the instruction and")
     print("     skill paths it actually loaded. File checks cannot prove that.")
     return 0
 

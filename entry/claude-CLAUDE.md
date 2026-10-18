@@ -5,34 +5,19 @@ rules, architecture, commands, plan format, and language.
 
 ## Workflow selection
 
-Use one primary workflow per task. An explicit request to use pstack or
-poteto-mode selects pstack; delegation or mode words in that same request do
-not also activate Goal. An explicit Goal request selects Goal. Keep the chosen
-workflow for follow-ups until the user switches it. Merely comparing or editing
-workflows selects neither. If the user explicitly requests both as primary
-workflows, clarify the intended primary before dependent work.
+An explicit request to use pstack or poteto-mode selects pstack. Keep it for
+follow-ups until the user switches. Merely comparing or editing workflows does
+not select it.
 
 When pstack is selected, read
 `{{WORKFLOW_DIR}}/pstack-compatibility.md` alongside its
-installed instructions. Use pstack only when explicitly selected during this
-trial; keep automatic routing off. Existing Goal triggers apply when no primary
-workflow has been selected.
+installed instructions. Use pstack only when explicitly selected; keep automatic
+routing off.
 
-## Goal workflow
-
-For software-development requests that begin with `Goal:` or `/goal`, specify
-`Mode: auto`, `solo`, `solo-reviewed`, or `team`, or explicitly ask for a
-software team, subagents, delegation, or parallel agent work, load and follow
-the user-level `goal` skill.
-
-Use the `goal` skill as the source of truth for execution modes, delegation,
-verification, and review. Default to `auto` and honor an explicit mode without
-silent downgrade.
-
-**Do not activate the workflow merely to discuss, inspect, or edit workflow
-settings.** Questions about the modes, edits to `~/.claude/CLAUDE.md`,
-`~/.claude/skills/`, `~/.claude/agents/`, `~/.claude/settings.json`, or a
-repository's agent docs are ordinary work — answer or edit directly.
+**Do not activate a workflow merely to discuss, inspect, or edit workflow
+settings.** Edits to `~/.claude/CLAUDE.md`, `~/.claude/skills/`,
+`~/.claude/settings.json`, or a repository's agent docs are ordinary work —
+answer or edit directly.
 
 ## Project independence
 
@@ -51,10 +36,8 @@ their own repositories, not here.
 
 No fixed lead model. Use the model and reasoning effort the user selected, and
 never ask the user to switch models unless their own instructions or the
-project's instructions require a specific one.
-
-The `goal` skill owns delegation roles and their routing. Check the session's
-own agent list rather than assuming a role exists.
+project's instructions require a specific one. Check the session's own agent
+list rather than assuming a role exists.
 
 ## Shared personal defaults
 

@@ -37,3 +37,8 @@ Supporting resources and licenses are retained.
 Upstream now names GLOSSARY.md instead of CONTEXT.md. The installed skill explicitly
 includes the project domain glossary while retaining discovery of actual project
 documents, file-reading restrictions, and the existing diagnosis adaptations.
+
+## Claude Code only — 2026-10-18
+
+Upstream `agents/openai.yaml` (Codex metadata) was removed when the setup became
+Claude Code only. Other supporting resources and the license are retained.

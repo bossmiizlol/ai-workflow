@@ -18,8 +18,9 @@ Local adaptations:
 - Offline inline CSS/SVG report, escaped source content, responsive accessibility
   and explicit static/visual verification boundaries.
 - Output location follows user/host requirements, otherwise the OS temporary directory.
-- Preserved upstream explicit-only invocation in Claude and Codex metadata; updated
-  the description to match the adapted survey behavior.
+- Preserved upstream explicit-only invocation in Claude metadata; updated the
+  description to match the adapted survey behavior. Upstream `agents/openai.yaml`
+  (Codex metadata) was removed on 2026-10-18 when the setup became Claude Code only.
 
 For updates, choose an upstream commit, review its changes against these adaptations,
 retain the license and record new digests. Run the global setup validator and the
