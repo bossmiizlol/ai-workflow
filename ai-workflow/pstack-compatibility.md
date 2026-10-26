@@ -15,9 +15,10 @@ current mode; otherwise ask in text. Check current agent status and use the
 supported wait, follow-up, or interrupt operation for the intended action. Use
 available task tracking, or the playbook's local checklist fallback.
 
-Inspect the Agent schema before passing `run_in_background`.
-Fork mode may remove this option and run spawned agents in the background.
-Await actual completion rather than assuming a foreground call is available.
+The current Agent tool has no `run_in_background` parameter; every spawned
+agent runs in the background. Do not pass it unless the session's Agent schema
+lists it again. Await the completion notification before using a result, and
+never assume a foreground call is available.
 
 ## Overlapping skills
 
