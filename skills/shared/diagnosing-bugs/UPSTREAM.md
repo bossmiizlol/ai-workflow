@@ -1,8 +1,8 @@
 # Upstream provenance
 
 Current upstream baseline
-[`mattpocock/skills`](https://github.com/mattpocock/skills/tree/4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d/skills/engineering/diagnosing-bugs)
-at commit `4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d` (2026-10-05), MIT licensed;
+[`mattpocock/skills`](https://github.com/mattpocock/skills/tree/5beb35b040e3de97e54fa9e386d7e42d15c295c2/skills/engineering/diagnosing-bugs)
+at commit `5beb35b040e3de97e54fa9e386d7e42d15c295c2`, MIT licensed;
 see `LICENSE`. This is the recorded vendoring baseline, not a claim of latest upstream.
 
 The personal installation replaces the repository-specific documentation instruction
@@ -10,8 +10,8 @@ with discovery of the current project's instructions and architecture or decisio
 records. It does not require `CONTEXT.md`, `AGENTS.md`, or `SPEC.md` to exist.
 The six diagnosis phases are retained.
 
-- Recorded upstream `SKILL.md` SHA-256: `9168404abda0967a5d32977e3498cd95fda6807018852f3de736a78357c82b40`
-- Installed `SKILL.md` SHA-256: `30457f7802a155e1bb56d8f895037b6349c8042884ec40eff198fe1829274f9b`
+- Recorded upstream `SKILL.md` SHA-256: `849198df88cdb65fd0d97236604c1fca7ff2f22d2f705f9724a800d0266b118d`
+- Installed `SKILL.md` SHA-256: `176cf416e9529127f02ebe75fc10db0ce07cdc7f2edcb3ff336238247d7ffef5`
 
 To update, retrieve the source at an explicitly chosen upstream commit, compare it
 with this installation, preserve the local adaptation and license, and record the
@@ -42,3 +42,9 @@ documents, file-reading restrictions, and the existing diagnosis adaptations.
 
 Upstream `agents/openai.yaml` (Codex metadata) was removed when the setup became
 Claude Code only. Other supporting resources and the license are retained.
+
+## Upstream reconciliation — 2026-10-26
+
+Baseline advanced to `5beb35b040e3de97e54fa9e386d7e42d15c295c2`. Only upstream SKILL.md changed
+since the previous baseline. Adopted the pristine-copy diff check for deliberately forced test failures.
+Preserved the local project-document discovery, bounded diagnosis workflow and metadata.

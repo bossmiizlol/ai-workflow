@@ -62,3 +62,29 @@ does not change the tool's instruction precedence or skill discovery behavior.
 If the global skill is unavailable, use an applicable repository skill or its
 stated fallback and report the limitation. If neither provides the required
 workflow, report the missing dependency before running it.
+
+## Browser verification and cleanup
+
+- Run browser tests headlessly in an isolated browser session by default, without
+  opening or controlling the user's regular browser. Use the actual application
+  and backend when live verification is requested. If a check needs a visible
+  window or manual authentication, explain that limitation and use a separate
+  temporary session.
+- Background execution still requires waiting for completion, checking exit codes
+  and actual results, and reporting failures honestly. Do not leave a test running
+  and report success before it finishes.
+- Before testing, record the working-tree baseline and ownership of temporary
+  files, processes and fixtures. Preserve existing user edits and data.
+- After tests finish or are stopped, record the results and limitations in the
+  response and any required project status documentation. Then delete the task's
+  temporary test scripts, logs, screenshots, traces, reports and fixture files,
+  including task-owned artifacts under `.audit/`. Remove only database fixtures
+  created by the task, by their recorded IDs, and verify cleanup.
+- Stop browser sessions and local servers started only for the test. Restore
+  incidental tool-generated edits, including changes to repository `AGENTS.md`,
+  to their pre-test state. Use the recorded baseline; do not discard existing
+  changes or intentionally requested edits.
+- Keep maintained unit tests, regression tests, E2E suites and API test collections.
+  Deleting temporary test artifacts does not authorize deleting those tests.
+- Verify cleanup with Git status and diffs and check that documentation does not
+  link to deleted temporary artifacts. Report any cleanup that remains blocked.
