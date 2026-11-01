@@ -1,11 +1,11 @@
 # Upstream provenance
 
-Adapted from [mattpocock/skills](https://github.com/mattpocock/skills/tree/4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d/skills/engineering/improve-codebase-architecture)
-at commit `4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d`. Installed 2026-09-20. MIT licensed; see LICENSE.
+Adapted from [mattpocock/skills](https://github.com/mattpocock/skills/tree/4ae2317/skills/engineering/improve-codebase-architecture)
+at commit `4ae2317` (2026-10-31). Installed 2026-09-20. MIT licensed; see LICENSE.
 This is a pinned vendoring baseline, not an automatic-update subscription.
 
-- Recorded upstream `SKILL.md` SHA-256: `552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392`
-- Installed `SKILL.md` SHA-256: `72823497ca53a114d38283aa2692f7f11f957f68fc1b3b1bed2a75020bb8b3d6`
+- Recorded upstream `SKILL.md` SHA-256: `35b03a3db61e0f5aa333ea59b54963e45a3d2ace6649b2ef4f9576603e2582a6`
+- Installed `SKILL.md` SHA-256: `34f54645bca300d35cc882a8b91fcbd4eb2136ea5cf028a0c9f1ad4e8c123b77`
 - Installed `HTML-REPORT.md` SHA-256: `ca17b187f2052940061575b9b589c0aa733458fa172e574ee03d0ebeca1e3589`
 
 Local adaptations:
@@ -20,7 +20,9 @@ Local adaptations:
 - Output location follows user/host requirements, otherwise the OS temporary directory.
 - Preserved upstream explicit-only invocation in Claude metadata; updated the
   description to match the adapted survey behavior. Upstream `agents/openai.yaml`
-  (Codex metadata) was removed on 2026-10-18 when the setup became Claude Code only.
+  (Codex metadata) was removed on 2026-10-18 when the setup became Claude Code only,
+  and reinstated on 2026-11-01 with `allow_implicit_invocation: false` when Codex
+  support returned alongside `~/.codex/AGENTS.md`.
 
 For updates, choose an upstream commit, review its changes against these adaptations,
 retain the license and record new digests. Run the global setup validator and the
@@ -36,3 +38,14 @@ Upstream changed its domain-document references from CONTEXT.md to GLOSSARY.md.
 The installed skill continues to discover the actual project glossary and now
 states the filename-independent rule without singling out an old filename.
 The report-first workflow and explicit-only invocation remain unchanged.
+
+## Upstream reconciliation — 2026-11-01
+
+Baseline advanced from `4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d` to `4ae2317`
+(upstream HEAD, 2026-10-31). Compared all files in the upstream skill directory;
+SKILL.md is the only changed file, in one line (commit `7739eae`, 2026-10-29):
+the exploration sub-agent must start with a fresh context window, not a fork.
+Adopted as a rule for the optional, separately authorized delegate: start it with
+a fresh context window so it does not inherit this conversation's conclusions.
+Direct exploration by default, report-first output and explicit-only invocation
+are unchanged.

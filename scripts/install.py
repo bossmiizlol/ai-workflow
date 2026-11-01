@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Install the shared personal AI workflow for Claude Code.
+"""Install the shared personal AI workflow for Claude Code and Codex.
 
 One source of truth lives in this repository:
 
   ai-workflow/WORKFLOW.md      shared working agreements Claude reads
   skills/shared/<name>         generic skills, installed once into ~/.agents/skills
   entry/claude-CLAUDE.md       the block merged into ~/.claude/CLAUDE.md
+  entry/codex-AGENTS.md        the block merged into ~/.codex/AGENTS.md
 
 Claude sees the shared skills through symlinks into ~/.agents/skills, so a
 shared method is edited in exactly one place. Every reference to WORKFLOW.md is
@@ -130,6 +131,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="Shared skills directory (default: <home>/.agents/skills).")
     parser.add_argument("--claude-home", type=Path, default=None,
                         help="Claude Code configuration directory (default: <home>/.claude).")
+    parser.add_argument("--codex-home", type=Path, default=None,
+                        help="Codex configuration directory (default: <home>/.codex).")
     parser.add_argument("--upgrade", action="store_true",
                         help="Back up and replace anything that already exists and differs.")
     parser.add_argument("--dry-run", action="store_true",
@@ -143,6 +146,7 @@ def build_plan(args: argparse.Namespace) -> tuple[Plan, Path, dict[str, Path]]:
         "workflow": (args.workflow_dir or home / ".config/ai-workflow"),
         "shared": (args.shared_skills_dir or home / ".agents/skills"),
         "claude": (args.claude_home or home / ".claude"),
+        "codex": (args.codex_home or home / ".codex"),
     }
     dirs = {key: path.expanduser().resolve(strict=False) for key, path in dirs.items()}
     workflow_md = dirs["workflow"] / "WORKFLOW.md"
@@ -163,6 +167,7 @@ def build_plan(args: argparse.Namespace) -> tuple[Plan, Path, dict[str, Path]]:
         plan.retire.append(dirs["claude"] / relative)
 
     plan.blocks.append((dirs["claude"] / "CLAUDE.md", REPO_ROOT / "entry/claude-CLAUDE.md"))
+    plan.blocks.append((dirs["codex"] / "AGENTS.md", REPO_ROOT / "entry/codex-AGENTS.md"))
 
     return plan, workflow_md, dirs
 
@@ -371,7 +376,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Shared skills:   {dirs['shared']}  (Claude reads them through symlinks)")
     print("Next:")
     print(f"  1. Validate with: {validator}")
-    print("  2. Start a new Claude Code session; it reads instructions and skills")
+    print("  2. Start a new Claude Code or Codex session; it reads instructions and skills")
     print("     at session start.")
     print("  3. In a fresh session, ask it to list the instruction and")
     print("     skill paths it actually loaded. File checks cannot prove that.")

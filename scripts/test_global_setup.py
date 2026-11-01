@@ -37,6 +37,7 @@ REPO = args.repo.expanduser().resolve() if args.repo else None
 SHARED = ROOT / '.agents/skills'
 WORKFLOW = ROOT / '.config/ai-workflow/WORKFLOW.md'
 ENTRY = ROOT / '.claude/CLAUDE.md'
+CODEX_ENTRY = ROOT / '.codex/AGENTS.md'
 
 
 def frontmatter(path: Path) -> dict:
@@ -50,9 +51,24 @@ class GlobalSetupTests(unittest.TestCase):
                       'entry file does not point at the shared workflow')
 
     def test_no_unrendered_placeholders(self):
-        text = ENTRY.read_text(encoding='utf-8')
-        for token in (TOKEN, DIR_TOKEN):
-            self.assertNotIn(token, text, 'install.py did not render the workflow path here')
+        for entry in (ENTRY, CODEX_ENTRY):
+            with self.subTest(entry=entry):
+                text = entry.read_text(encoding='utf-8')
+                for token in (TOKEN, DIR_TOKEN):
+                    self.assertNotIn(token, text, 'install.py did not render the workflow path here')
+
+    def test_codex_shared_workflow_reference(self):
+        self.assertTrue(WORKFLOW.is_file(), f'missing {WORKFLOW}')
+        self.assertTrue(CODEX_ENTRY.is_file(), f'missing {CODEX_ENTRY}')
+        self.assertIn(str(WORKFLOW), CODEX_ENTRY.read_text(encoding='utf-8'),
+                      'Codex entry file does not point at the shared workflow')
+
+    def test_codex_explicit_only_skills(self):
+        for name in ('handoff', 'improve-codebase-architecture'):
+            with self.subTest(skill=name):
+                path = SHARED / name / 'agents/openai.yaml'
+                metadata = yaml.safe_load(path.read_text(encoding='utf-8'))
+                self.assertIs(metadata['policy']['allow_implicit_invocation'], False)
 
     def test_shared_skill_metadata_and_local_references(self):
         for name in SHARED_SKILLS:
@@ -130,8 +146,11 @@ class RepositoryParityTests(unittest.TestCase):
                                  self.rendered(source))
 
     def test_entry_block_present(self):
-        body = self.rendered('entry/claude-CLAUDE.md').strip('\n')
-        self.assertIn(body, ENTRY.read_text(encoding='utf-8'))
+        for source, entry in (('entry/claude-CLAUDE.md', ENTRY),
+                              ('entry/codex-AGENTS.md', CODEX_ENTRY)):
+            with self.subTest(entry=entry):
+                body = self.rendered(source).strip('\n')
+                self.assertIn(body, entry.read_text(encoding='utf-8'))
 
 
 if __name__ == '__main__':

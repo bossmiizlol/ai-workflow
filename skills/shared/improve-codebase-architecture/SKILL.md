@@ -28,8 +28,10 @@ issues, configuration, or dependencies as a side effect of the review.
 - Use the current tool's available search and file-reading tools. Explore directly
   by default. Delegate only when separately authorized by the user or applicable
   workflow and useful; use actual available read-only agent capabilities rather
-  than assuming Claude's Agent tool or a specific agent name exists. This skill
-  does not itself request delegation or activate Goal.
+  than assuming Claude's Agent tool or a specific agent name exists. Start such a
+  delegate with a fresh context window rather than a fork of this conversation, so
+  it walks the codebase without inheriting these conclusions. This skill does not
+  itself request delegation or activate Goal.
 
 ## Evaluate candidates
 

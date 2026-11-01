@@ -32,6 +32,19 @@ and proceed.
 Keep domain rules, architecture, commands, and project-specific requirements in
 their own repositories, not here.
 
+## Browser
+
+For any browsing, page reading or web-app check that needs a real browser, use
+Claude's own built-in browser pane (the `mcp__Claude_Browser__*` tools, loading
+the `anthropic-skills:built-in-browser` skill first). Never use Claude in Chrome
+(`mcp__claude-in-chrome__*`) and never open or control the user's Chrome or any
+other external browser; this user does not use Claude through Chrome, and the
+Chrome integration is turned off on purpose. When the built-in browser is not
+available in the session (a terminal without the desktop app), say so, then use
+WebFetch for plain page content or a headless isolated browser session as
+WORKFLOW.md describes. Orca's embedded browser applies only when the task runs
+inside Orca through the orca-cli skill.
+
 ## Models
 
 No fixed lead model. Use the model and reasoning effort the user selected, and
