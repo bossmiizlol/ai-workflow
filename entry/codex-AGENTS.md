@@ -4,7 +4,7 @@
 ## pstack model configuration
 
 Apply these role overrides only when pstack is explicitly selected. These are
-local role assignments adapted from OpenAI guidance, checked 2026-11-01:
+local role assignments adapted from OpenAI guidance, checked 2026-11-04:
 https://learn.chatgpt.com/docs/models#recommended-models
 Use GPT-6.1 Sol for coding and analysis, Luna for bounded repeatable tooling,
 and Astra for the strongest-judgment role. Panel composition is a local pstack
@@ -37,6 +37,8 @@ arena cross-judge pool: gpt-6-astra, gpt-6.1-sol, gpt-6-luna
 swarm workers: gpt-6.1-sol
 architect runners: gpt-6-astra, gpt-6.1-sol, gpt-6-luna
 interrogate reviewers: gpt-6-astra, gpt-6.1-sol, gpt-6-luna
+thermos reviewers: gpt-6.1-sol
+no-comments reviewer: gpt-6.1-sol
 
 default effort: session
 <!-- END PSTACK MODEL CONFIGURATION -->

@@ -22,8 +22,8 @@ Do not import assumptions, paths, database names or workflows from another proje
 - Review tools such as grill-me, junior-to-senior, last-20-percent and
   improve-codebase-architecture apply when the user asks for their kind of review.
   Do not attach a review workflow to every task. handoff and
-  improve-codebase-architecture are explicit-invocation only, so they never appear
-  in a tool's automatic skill list.
+  improve-codebase-architecture require explicit invocation. In Codex, request
+  `$handoff` or `$improve-codebase-architecture` to invoke them.
 - Keep secrets and credentials out of responses, logs and committed files. Read only
   what the task requires and follow any repository file-reading restrictions.
 - Complete authorized reversible work without repeated permission questions. Confirm

@@ -27,7 +27,7 @@ Local adaptations:
 To update, retrieve the source at an explicitly chosen upstream commit, compare it
 with this installation, preserve the local adaptations and license, and record the
 new baseline and installed digests. No skills lockfile is required. Run
-`~/.config/ai-workflow/.venv/bin/python ~/.config/ai-workflow/test_global_setup.py -v`
+`python3 ~/.config/ai-workflow/test_global_setup.py -v`
 to check the installed digest and file connections; this does not check upstream freshness.
 
 ## Installed-content audit — 2026-09-20

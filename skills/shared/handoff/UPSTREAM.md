@@ -23,7 +23,7 @@ Claude Code and Codex; `test_global_setup.py` checks both entry files.
 
 To update, retrieve the source at an explicitly chosen upstream commit, compare it
 with this installation, and record the new baseline and installed digests. Run
-`~/.config/ai-workflow/.venv/bin/python ~/.config/ai-workflow/test_global_setup.py -v`
+`python3 ~/.config/ai-workflow/test_global_setup.py -v`
 to check the installed digest and file connections; this does not check upstream freshness.
 
 ## Upstream reconciliation — 2026-10-26

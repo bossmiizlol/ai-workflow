@@ -22,7 +22,7 @@ to avoid listing configuration and generated output as both exempt and approval-
 To update, retrieve the source at an explicitly chosen upstream commit, compare it
 with the installed files, preserve and document local adaptations, and retain the
 copyright and license. Recompute installed digests and run
-`~/.config/ai-workflow/.venv/bin/python ~/.config/ai-workflow/test_global_setup.py -v`.
+`python3 ~/.config/ai-workflow/test_global_setup.py -v`.
 The checks verify the local installation, not upstream freshness or TDD behavior.
 
 ## Installed-content audit — 2026-09-20

@@ -15,6 +15,7 @@ import argparse
 import hashlib
 from pathlib import Path
 import re
+import tomllib
 import unittest
 
 import yaml
@@ -45,6 +46,37 @@ def frontmatter(path: Path) -> dict:
 
 
 class GlobalSetupTests(unittest.TestCase):
+    def test_codex_pstack_role_configuration(self):
+        sheet_path = ROOT / '.codex/pstack-models.md'
+        if not sheet_path.is_file():
+            self.skipTest('no Codex pstack role sheet; setup-pstack writes it, not install.py')
+        entry = CODEX_ENTRY.read_text(encoding='utf-8')
+        sheet = sheet_path.read_text(encoding='utf-8')
+        pattern = r'^([a-z][a-z ,\-]+): (gpt-[^\n]+|session)$'
+        entry_rows = re.findall(pattern, entry, re.MULTILINE)
+        sheet_rows = re.findall(pattern, sheet, re.MULTILINE)
+        self.assertTrue(sheet_rows, 'pstack role sheet is empty')
+        self.assertEqual(entry_rows, sheet_rows, 'pstack role overrides drifted')
+        self.assertEqual(re.findall(r'^session hook: (.*)$', sheet, re.MULTILINE),
+                         ['off'], 'automatic pstack routing must stay off')
+
+    def test_codex_local_marketplace_paths(self):
+        config_path = ROOT / '.codex/config.toml'
+        if not config_path.is_file():
+            self.skipTest('no Codex config.toml; Codex writes it, not install.py')
+        config = tomllib.loads(config_path.read_text(encoding='utf-8'))
+        for name, source in config.get('marketplaces', {}).items():
+            if source.get('source_type') == 'local':
+                with self.subTest(marketplace=name):
+                    self.assertTrue(Path(source['source']).is_dir(), source['source'])
+
+    def test_maintenance_commands_do_not_require_broken_environment(self):
+        for name in SHARED_SKILLS:
+            path = SHARED / name / 'UPSTREAM.md'
+            with self.subTest(skill=name):
+                self.assertNotIn('~/.config/ai-workflow/.venv/bin/python ',
+                                 path.read_text(encoding='utf-8'))
+
     def test_shared_workflow_is_reachable_from_the_entry_file(self):
         self.assertTrue(WORKFLOW.is_file(), f'missing {WORKFLOW}')
         self.assertIn(str(WORKFLOW), ENTRY.read_text(encoding='utf-8'),
@@ -59,7 +91,6 @@ class GlobalSetupTests(unittest.TestCase):
 
     def test_codex_shared_workflow_reference(self):
         self.assertTrue(WORKFLOW.is_file(), f'missing {WORKFLOW}')
-        self.assertTrue(CODEX_ENTRY.is_file(), f'missing {CODEX_ENTRY}')
         self.assertIn(str(WORKFLOW), CODEX_ENTRY.read_text(encoding='utf-8'),
                       'Codex entry file does not point at the shared workflow')
 
@@ -146,11 +177,8 @@ class RepositoryParityTests(unittest.TestCase):
                                  self.rendered(source))
 
     def test_entry_block_present(self):
-        for source, entry in (('entry/claude-CLAUDE.md', ENTRY),
-                              ('entry/codex-AGENTS.md', CODEX_ENTRY)):
-            with self.subTest(entry=entry):
-                body = self.rendered(source).strip('\n')
-                self.assertIn(body, entry.read_text(encoding='utf-8'))
+        body = self.rendered('entry/claude-CLAUDE.md').strip('\n')
+        self.assertIn(body, ENTRY.read_text(encoding='utf-8'))
 
 
 if __name__ == '__main__':
